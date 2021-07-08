@@ -5,3 +5,7 @@ Il s’agit d’une station de mesures environnementales développée en 2018 pa
 QameleO mesure la qualité de l’air et plus précisément les concentrations en particules fines (particules de diamètre inférieur à 10 et 2.5 microns) et ultrafines (particules de diamètre inférieur à 1 micron).
 
 Vous pouvez retrouver la totalité de ce projet sur notre site http://cofab-in-bondy.fr/
+
+# Credits
+
+Guillian est le plus beau.
