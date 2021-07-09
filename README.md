@@ -8,4 +8,4 @@ Vous pouvez retrouver la totalité de ce projet sur notre site http://cofab-in-b
 
 # Credits
 
-Guillian est le plus beau.
+Merci à Nicolas et surtout Guillian pour leur travail acharné !
