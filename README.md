@@ -6,6 +6,8 @@ QameleO mesure la qualité de l’air et plus précisément les concentrations e
 
 Vous pouvez retrouver la totalité de ce projet sur notre site http://cofab-in-bondy.fr/
 
+![alt tag](https://user-images.githubusercontent.com/85280800/125935719-2f78340f-db23-4a08-a076-5162feabda39.png)
+
 # Credits
 
 Merci à Nicolas et surtout Guillian pour leur travail acharné !
