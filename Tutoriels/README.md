@@ -11,6 +11,7 @@ Ceux-ci sont donc protégés par une __licence Creative Commons "CC-BY-NC-ND 4.0
 * En cas de réutilisation des textes ou images, vous devez citer les auteurs et mentionner la licence ;
 * Pas d'Utilisation Commerciale ;
 * Pas de Modification.
+
 ![alt tag](https://user-images.githubusercontent.com/85280800/125935398-05e5a42e-d041-40d5-8e4b-a804a257f45a.png)
 
 Plus d'informations sur vos droits et obligations sur le [site internet de Creative Commons](https://creativecommons.org/licenses/by-nc-nd/4.0/)
