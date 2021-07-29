@@ -1,12 +1,12 @@
 # QameleO
+QameleO (Quality of Air Module for Environmental Learning Engineering and Observation) is an environmental measurement station for air quality. It was developed since 2018 by the CoFab in Bondy and two research teams at the Research Institute for Development in Bondy and the University of Burgundy in Dijon (UMI 209 UMMISCO and UMR CNRS 6282 BIOGEOSCIENCES).
 
-Il s’agit d’une station de mesures environnementales développée en 2018 par deux équipes de recherches à l’Université de Bourgogne à Dijon (Nadège MARTINY, UMR CNRS 6282 BIOGEOSCIENCES) et à l’Institut de Recherches pour le Développement à Bondy (Nicolas MARILLEAU, UMI 209 UMMISCO).
+This new device is based on (i) low-cost technology making it possible to plan for a network deployment of measurements; (ii) it now has sensors to simultaneously measure the 3 size fractions of particulate pollution (PM10, PM2.5 and PM1), as well as temperature and humidity; (iii) the measurements are calibrated with an original method, thus allowing scientific use.
 
-QameleO mesure la qualité de l’air et plus précisément les concentrations en particules fines (particules de diamètre inférieur à 10 et 2.5 microns) et ultrafines (particules de diamètre inférieur à 1 micron).
 
 Vous pouvez retrouver la totalité de ce projet sur notre site http://cofab-in-bondy.fr/
 
-![alt tag](https://user-images.githubusercontent.com/85280800/125935719-2f78340f-db23-4a08-a076-5162feabda39.png)
+![alt tag](https://user-images.githubusercontent.com/85280800/125935719-2f78340f-db23-4a08-a076-5162feabda39.png| width=100)
 
 # Credits
 
