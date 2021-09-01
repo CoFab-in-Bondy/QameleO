@@ -6,7 +6,7 @@ This new device is based on (i) low-cost technology making it possible to plan f
 
 Vous pouvez retrouver la totalité de ce projet sur notre site http://cofab-in-bondy.fr/
 
-![Alt Text](/images/qameleo.jpg | width=100)
+![Alt Text](/images/qameleo.jpg?width=10px&style=centerme)
 
 # Credits
 
