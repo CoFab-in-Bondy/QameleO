@@ -1,19 +1,23 @@
-#ifndef QameleO_CONF
-#define QameleO_CONF 
+#ifndef QAMELEO_CONF_H
+#define QAMELEO_CONF_H
 
 // 1 - DEFINE THE NAME OF THE QameleO ACCORDING to the DATABASE
 #define SENSOR_NAME "TEST_I2C1"
 
 // 2 - DEFINE QameleO INTERNAL COMPONENTS
 
-#define DHT_SENSOR
-//#define SHT_SENSOR
+//#define DHT_SENSOR
+#define SHT_SENSOR
 
 #define NextPM_SENSOR
+//#define PMS7003_SENSOR
 
+#define CONFIG_MEGA
+ 
 // 3 - DEFINE log system
-#define FILE_NAME_LOG "datalog.csv"
-#define FILE_NAME_BUFFER "databuffer.csv"
+#define FILE_NAME_LOG "datalog.csv"           //Contient les données envoyées en GSM    //"datalog.csv"
+#define FILE_NAME_BUFFER "notsend.csv"        //Contient les données qui n'ont pas encore été envoyé en GSM  //"databuffer.csv"
+#define FILE_NAME_SAVE "timesave.csv"     //Contient les temps effectués par le programme en cas de reboot
 
 
 // 4 - DEFINE GSM Connection
@@ -32,10 +36,10 @@
 
 
 
-#define MEASURE_PERIOD 15 
-//#define REBOOT_DELAY 5 
+#define MEASURE_PERIOD 1 // Temps en minutes     //default = 15
+#define SEND_PERIOD 1    // Temps en minutes     //default = 60
 
 
 // XXX - DEFINE REBOOT DELAY
 #define REBOOT_DELAY 5 
-#endif // QameleO_CONF
+#endif // QAMELEO_CONF_H
