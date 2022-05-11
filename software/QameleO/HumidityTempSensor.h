@@ -1,11 +1,45 @@
-#ifndef HUMIDITY_TEMP_SENSOR_H
-#define HUMIDITY_TEMP_SENSOR_H 
+#ifndef HUMIDITYTEMPSENSOR_H
+#define HUMIDITYTEMPSENSOR_H
 
 class HumidityTempSensor
 {
+  protected:
+    /** 
+     *  Ratio of humidty
+     */
+    float humidity;
+
+    /**
+     * Temperature 
+     */
+    float temperature;
+    
   public:
-    virtual void setupHumidityTemperature();
-    virtual void measureHumidityTemperature(float & temp, float & hum); 
+    /**
+     * Maker of the class
+     */
+    HumidityTempSensor();
+
+    /**
+     * Return the ratio of humidity
+     */
+    float getHumidity_();
+
+    /**
+     * Return the temperature
+     */
+    float getTemperature_();
+
+    /**
+     * This method need to be write to collect the sensor's data
+     */
+    virtual void runProcess();
+
+    /**
+     * This method need to be write to setup the sensor
+     */
+    virtual void setupSensor(); 
+  
 };
 
-#endif
+#endif // HUMIDITYTEMPSENSOR_H
