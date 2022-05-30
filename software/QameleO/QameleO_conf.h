@@ -2,7 +2,7 @@
 #define QAMELEO_CONF_H
 
 // 1 - DEFINE THE NAME OF THE QameleO ACCORDING to the DATABASE
-#define SENSOR_NAME "TEST_I2C1"
+#define SENSOR_NAME "TEST_"
 
 // 2 - DEFINE QameleO INTERNAL COMPONENTS
 
@@ -36,8 +36,9 @@
 
 
 
-#define MEASURE_PERIOD 1 // Temps en minutes     //default = 15
-#define SEND_PERIOD 1    // Temps en minutes     //default = 60
+#define MEASURE_PERIOD 1            // Temps en minutes     //default = 15
+#define SEND_PERIOD 4               // Temps en minutes     //default = 60
+#define RECEIVE_UNIXTIME_PERIOD 240 // Temps en minutes     //default = 240
 
 
 // XXX - DEFINE REBOOT DELAY

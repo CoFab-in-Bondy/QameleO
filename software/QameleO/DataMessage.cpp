@@ -24,10 +24,13 @@ DataMessage::DataMessage()
   #else 
     this->humTempSensor = false;
   #endif
-  startTime = 0; // date de départ en seconde
+  
+  /*startTime = 0; // date de départ en seconde
   initOffset = 1000000000; // date de départ en seconde
-  lastUpdate = 1000000000;
+  lastUpdate = 1000000000;*/
 }
+
+unsigned long DataMessage::unixTime = 0;
 
 /**
  * Add a time on the string
@@ -37,13 +40,13 @@ DataMessage::DataMessage()
  */
 String DataMessage::buildCaptureMessage(String data, int nbReboot)
 {
-  int retry = 10;
+  /*int retry = 10;
   while (lastUpdate  > millis()|| (lastUpdate + 7200000)  < millis() || startTime < 1561757324) {   // 7200000= 2h
     this->updateClock();
     retry = retry - 1;
     if(retry < 0)
       return "";
-  }
+  }*/
   
   this->messageID = this->messageID + 1;
   String sid = String(this->messageID);
@@ -99,7 +102,7 @@ String DataMessage::haveNegativeClock(String msg, int nbRebootMax)
   String clockString="";
   String idRebootString="";
   byte check=0;
-  long clockLong, idReboot;
+  long clockLong;
   char buf[msg.length()+1];
   msg.toCharArray(buf,msg.length()+1);
   
@@ -120,7 +123,7 @@ String DataMessage::haveNegativeClock(String msg, int nbRebootMax)
   Serial.println("toInt() w/ int : " + String(basilic));
   Serial.println("toInt() w/ long : " + String(canard)); */
   QameleO_SD sd;
-  clockLong = clockString.toInt() - sd.readBackup(idRebootString.toInt(), nbRebootMax); //mettre à la place de millis un appel qui renvois le tps à soustraire du msg
+  clockLong = clockString.toInt() - sd.readBackup(idRebootString.toInt(), nbRebootMax);
   /*Serial.println("Quasiment le tps utilisé " + String(millis()));
   Serial.println("Horloge négative : " + String(clockLong));*/
     
@@ -134,9 +137,64 @@ String DataMessage::haveNegativeClock(String msg, int nbRebootMax)
 }
 
 /**
+ * Replace the message clock with the unix time
+ * 
+ * @param msg - the String where to put the unix time
+ * @param nbRebootMax - the number of program restarts
+ * @return the changed message
+ */
+String DataMessage::haveUnixTime(String msg, int nbRebootMax)
+{
+  String clockString="";
+  String idRebootString="";
+  byte check=0;
+  long newTime;
+  char buf[msg.length()+1];
+  msg.toCharArray(buf,msg.length()+1);
+  
+  for(int i=0;i<sizeof(buf) && check!=2 ;i++){
+    //Serial.print(buf[i]);
+    if (buf[i]==';' || buf[i]=='$'){
+      check++;
+    }else {
+      if (check==0)
+        clockString += buf[i];
+      if (check==1)
+        idRebootString += buf[i];
+    }
+  }
+  
+  QameleO_SD sd;
+  newTime = clockString.toInt() + sd.readBackup(idRebootString.toInt(), nbRebootMax);
+  newTime = newTime/1000;   //To have the time in second
+  newTime += this->unixTime;
+
+  return String(newTime)+msg.substring(msg.indexOf(";",msg.indexOf(";")+1));
+}
+
+/**
+ * Set the unix time to use
+ * 
+ * @param n - the unix time to use
+ */
+void DataMessage::setUnixTime(unsigned long n)
+{
+  this->unixTime = n;
+}
+
+bool DataMessage::unixTimeIsSet()
+{
+  if(this->unixTime > 0){
+    return true;
+  }else {
+    return false;
+  }
+}
+
+/**
  * Update the clock
  */
-void DataMessage::updateClock()
+/*void DataMessage::updateClock()
 {
   SerialAT.print("AT+CCLK?\r\n");
   String input = SerialAT.readString();
@@ -152,4 +210,4 @@ void DataMessage::updateClock()
   Serial.println(mt);
   lastUpdate = millis();
   startTime = mt; // date de départ en seconde
-}
+}*/

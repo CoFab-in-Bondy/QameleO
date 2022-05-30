@@ -28,10 +28,15 @@ class DataMessage
      * Keep the id of the last message create
      */
     int messageID;
+
+    /**
+     * Keep the unix time send by the server or by default 0
+     */
+    static unsigned long unixTime;
     
-    uint32_t startTime;
+    /*uint32_t startTime;
     unsigned long initOffset;
-    unsigned long lastUpdate;
+    unsigned long lastUpdate;*/
     
     /**
      * Add a time on the string
@@ -43,7 +48,7 @@ class DataMessage
     /**
      * Update the clock
      */
-    void updateClock();
+    //void updateClock();
   
   public : 
 
@@ -62,11 +67,35 @@ class DataMessage
     /**
      * Replace the message clock with a negative clock
      * 
-     * @param msg - The String where to put the negative clock
+     * @param msg - the String where to put the negative clock
      * @param nbRebootMax - the number of program restarts
      * @return the changed message
      */
      String haveNegativeClock(String msg, int nbRebootMax);
+
+    /**
+     * Replace the message clock with the unix time
+     * 
+     * @param msg - the String where to put the unix time
+     * @param nbRebootMax - the number of program restarts
+     * @return the changed message
+     */
+     String haveUnixTime(String msg, int nbRebootMax);
+
+     /**
+      * Set the unix time to use
+      * 
+      * @param n - the unix time to use 
+      */
+     void setUnixTime(unsigned long n);
+
+     /**
+      * Use to check if the unix time is set
+      * 
+      * @return true - if the unix time has been set
+      * @return false - if the unix time hasn't been set
+      */
+     bool unixTimeIsSet();
 
 
 };
