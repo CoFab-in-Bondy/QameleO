@@ -7,6 +7,11 @@
 #include <PubSubClient.h>
 #include <TinyGsmClient.h>
 
+/**
+ *  
+ */
+void callback(char* topic, byte *payload, unsigned int length);
+
 class QameleO_GSM
 {
   private:
@@ -19,6 +24,11 @@ class QameleO_GSM
      * Contians the number of times that data has been sent by the GSM system
      */
     unsigned long nbSendMeasure;
+
+    /**
+     * Contians the number of times that unix time has been receive by the GSM system
+     */
+    unsigned long nbUnixTimeReceive;
     
   public:
     /**
@@ -27,9 +37,14 @@ class QameleO_GSM
     QameleO_GSM();
 
     /**
-     * Adds plus one to cycle
+     * Adds plus one to nbSendMeasure
      */
     void addOneSendMeasure();
+
+    /**
+     * Adds plus one to nbUnixTimeReceive
+     */
+    void addOneReceiveTime();
     
     /**
      *  Close the connection
@@ -37,9 +52,22 @@ class QameleO_GSM
     void closeGSM();
 
     /**
-     * Return the number of cycle
+     * Return the number of SendMeasure
      */
     unsigned long getNbOfSendMeasure();
+
+    /**
+     * Return the number of unix time have been receive
+     */
+    unsigned long getNbOfUnixTimeReceive();
+
+    /**
+     * Connect to the server on topic myTimer, and read the clock to know what time is it
+     * 
+     * @return true - if the program has been subscribe to the server
+     * @return false - if the program meet a problem to subscribe to the server
+     */
+    bool readTheClock();
     
     /**
      * Send the message create

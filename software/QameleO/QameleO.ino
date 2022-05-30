@@ -1,17 +1,29 @@
 #include "QameleO_conf.h"
 #include "QameleO_Fan.h"
 #include "QameleO_GSM.h"
+
 #include "DustSensor.h"
-#include "QameleO_NextPM_Dust.h"
-#include "QameleO_PMS7003_Dust.h"
+#ifdef NextPM_SENSOR
+  #include "QameleO_NextPM_Dust.h"
+#endif
+#ifdef PMS7003_SENSOR
+  #include "QameleO_PMS7003_Dust.h"
+#endif
+
 #include "HumidityTempSensor.h"
-#include "QameleO_DHT22_HumidityTemp.h"
-#include "QameleO_SHT35_HumidityTemp.h"
+#ifdef DHT_SENSOR
+  #include "QameleO_DHT22_HumidityTemp.h"
+#endif
+#ifdef SHT_SENSOR
+  #include "QameleO_SHT35_HumidityTemp.h"
+#endif
+
 #include "QameleO_SD.h" 
 #include "QameleO_Boot_System.h"
 #include "QameleO_struct.h"
 #include "DataMessage.h"
-#include "MyPile.h"
+#include "MyFile.h"
+#include "MyFile.cpp"
 #include "MyPile.cpp"
 
 QameleO_Fan myFan;
@@ -60,6 +72,8 @@ void setup() {
 }
 
 void loop() {
+  //Temporary part
+  //---------------------//
   /*
   mySD.temporaryMethod();
   delay(3600000); 
@@ -71,6 +85,13 @@ void loop() {
   delay(3600000);
   */
   
+  /*
+  mySD.getDataToSend();
+  Serial.println("getDataToSend est bien passé");
+  delay(3600000);
+  */
+  //---------------------//
+    
   timerSystem.startMyWatchdog();
   Serial.println("start sensor");
   unsigned long startAcquire = millis();
@@ -109,43 +130,66 @@ void loop() {
     timerSystem.reboot_now();
     delay(6000);
   }else {
-    mySD.saveToSD(dte);
+    mySD.saveToSDBuffer(dte);
   }
   //---------------------//
 
+  /*
   //Simule un envoi par GSM
   //---------------------//
   long timeSend = millis() - myGSM.getNbOfSendMeasure()*60000*SEND_PERIOD; //60000 = 1 min
   if ( timeSend >= 0 ){      
-    long quetzal = millis()/6000;
-    Serial.println("Temps écoulé depuis le debut : " + String(quetzal));
+    long quetzal = millis()/60000;
+    Serial.println("Temps écoulé depuis le debut en minutes : " + String(quetzal));
     myGSM.addOneSendMeasure();
     //Serial.println("Trying to read...");
-    Pile<String> dataToSend = mySD.getDataToSend();
+    Queue<String> dataToSend = mySD.getDataToSend();
     if(dataToSend.isEmpty())
         Serial.println("There are no data to send");
     while(!dataToSend.isEmpty()){
-      Serial.println(myDataMsg.haveNegativeClock(dataToSend.pop(),timerSystem.getNbReboot()));
+      String tmp = dataToSend.dequeue();
+      Serial.println(myDataMsg.haveNegativeClock(tmp,timerSystem.getNbReboot()));
     }
     //timerSystem.reboot_now();     //à commenter ou décommenter si on veut tester avec ou sans reboot
     mySD.resetFileDataToSend();
   }
   //---------------------//
-  
-  /*
-  //GSM Party
+  */
+
+  //Set/Get Unix time
   //---------------------//
-  long timeSend = millis() - myGSM.getNbOfSendMeasure()*60000*SEND_PERIOD; //60000 = 1 min
-  if ( timeSend >= 0 ){      //Si cela fait une heure, les données sont envoyées par le GSM
+  long tmpTime = millis() - myGSM.getNbOfUnixTimeReceive()*60000*RECEIVE_UNIXTIME_PERIOD ; //60000 = 1 min
+  if (tmpTime >= 0){
+    myGSM.startupGSM();
+    if(myGSM.setupGSM()){
+      myGSM.addOneReceiveTime();
+      myGSM.readTheClock();
+      myGSM.stopGSM();
+    }else {
+      Serial.println("error : myGSM.setupGSM(), not any unix time receive");
+      if (!myDataMsg.unixTimeIsSet())
+        timerSystem.reboot_now();
+      delay(6000);
+    }
+  }
+  //---------------------//
+  
+  
+  //Send Party with GSM
+  //---------------------//
+  tmpTime = millis() - myGSM.getNbOfSendMeasure()*60000*SEND_PERIOD; //60000 = 1 min
+  if ( tmpTime >= 0 ){      //Si cela fait une heure, les données sont envoyées par le GSM
     myGSM.startupGSM();
     if(myGSM.setupGSM()){
       myGSM.addOneSendMeasure();
       //Serial.println("Trying to read...");
-      Pile<String> dataToSend = mySD.getDataToSend();
+      Queue<String> dataToSend = mySD.getDataToSend();
       if(dataToSend.isEmpty())
         Serial.println("There are no data to send");
       while(!dataToSend.isEmpty()){
-        if (myGSM.sendData(myDataMsg.haveNegativeClock(dataToSend.pop()))){
+        String tmpString = dataToSend.dequeue();
+        mySD.saveToSDLog(myDataMsg.haveUnixTime(tmpString,timerSystem.getNbReboot()));
+        if (myGSM.sendData(myDataMsg.haveNegativeClock(tmpString,timerSystem.getNbReboot()))){
           Serial.println(" The data has been send.");
         } else {
           Serial.println(" Failed, the data hasn't been send.");
@@ -161,7 +205,7 @@ void loop() {
     
   }
   //---------------------//
-  */
+  
   
   // delay(16 * 60000);
   timerSystem.stopMyWatchdog();

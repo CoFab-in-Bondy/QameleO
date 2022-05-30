@@ -2,7 +2,7 @@
 #define QAMELEO_SD_H
 
 #include <SD.h>
-#include "MyPile.h"
+#include "MyFile.h"
 
 class QameleO_SD
 {
@@ -18,11 +18,18 @@ class QameleO_SD
     File myFile2;
 
     /**
-     * Write in the SD card
+     * Write in the SD card on the buffer file
      * 
      * @param msg - The message to write
      */
-    void saveDataIn(String msg);
+    void saveDataInBufferFile(String msg);
+
+    /**
+     * Write in the SD card on the log file
+     * 
+     * @param msg - The message to write
+     */
+    void saveDataInLogFile(String msg);
 
     /**
      * That save the number return by millis() on a file
@@ -43,7 +50,7 @@ class QameleO_SD
     /**
      * Return all data saved but not send
      */
-    Pile<String> getDataToSend();
+    Queue<String> getDataToSend();
 
     /**
      * Remove the file use to save the data not send
@@ -73,11 +80,13 @@ class QameleO_SD
     void saveOnBackup(int n);
     
     /**
-     * Call wakeupSD and saveDataIn
+     * Call wakeupSD and saveDataInBufferFile
      * 
-     * @param msg - The argument of saveDataIn
+     * @param msg - The argument of saveDataInBufferFile
      */
-    void saveToSD(String msg);
+    void saveToSDBuffer(String msg);
+ 
+    void saveToSDLog(String msg);
 
     /**
      * Setup the pin of the SD card

@@ -17,11 +17,11 @@ QameleO_SD::QameleO_SD()
 }
 
 /**
- * Write in the SD card
+ * Write in the SD card on the buffer file
  * 
  * @param msg - The message to write
  */
-void QameleO_SD::saveDataIn(String msg)
+void QameleO_SD::saveDataInBufferFile(String msg)
 {
   myFile = SD.open(FILE_NAME_BUFFER, FILE_WRITE);
    // if the file opened okay, write to it:
@@ -38,6 +38,27 @@ void QameleO_SD::saveDataIn(String msg)
 }
 
 /**
+ * Write in the SD card on the log file
+ * 
+ * @param msg - The message to write
+ */
+void QameleO_SD::saveDataInLogFile(String msg)
+{
+  myFile = SD.open(FILE_NAME_LOG, FILE_WRITE);
+   // if the file opened okay, write to it:
+  if (myFile) {
+    Serial.print("Writing to " + String(FILE_NAME_LOG) + " ... ");
+    myFile.println(msg);
+    // close the file:
+    myFile.close();
+    Serial.println("done.");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening " + String(FILE_NAME_LOG));
+  }
+}
+
+/**
  * That save the number return by millis() at the begining of the file
  */
 void QameleO_SD::saveMillisInFile()
@@ -49,7 +70,7 @@ void QameleO_SD::saveMillisInFile()
         //read the file before, get all, sup the file, create the file and push the data
         char reader[myFile.size()];
         String oneLine;
-        MyFile<String> millisToSave;
+        Queue<String> millisToSave;
         /*int nbLine=0;*/
       
         //Serial.println("Reading to " + String(FILE_NAME_SAVE) + " ... ");
@@ -64,7 +85,6 @@ void QameleO_SD::saveMillisInFile()
             }else{
               /*nbLine++;
               //Serial.println(oneLine);*/
-              myFile2.println(oneLine);
               millisToSave.enqueue(oneLine);
               oneLine="";
             }
@@ -134,55 +154,112 @@ bool QameleO_SD::wakeupSD()
 /**
  * Saved the data on a other file and Return all data saved but not send
  */
-Pile<String> QameleO_SD::getDataToSend()
+//Queue<String> QameleO_SD::getDataToSend()
+//{
+//  if(this->wakeupSD()){
+//    myFile = SD.open(FILE_NAME_BUFFER, FILE_READ);
+//    myFile2 = SD.open(FILE_NAME_LOG, FILE_WRITE);
+//    if (!myFile || !myFile2){
+//      if(!myFile)
+//        Serial.println("Error opening " + String(FILE_NAME_BUFFER));
+//      if(!myFile2)
+//        Serial.println("Error opening " + String(FILE_NAME_LOG));
+//      Queue<String> empty;
+//      return empty;
+//    }else {
+//      char reader[myFile.size()];
+//      String oneLine;
+//      Queue<String> dataToSend;
+      /*int nbLine=0;*/
+      
+//      Serial.println("Reading to " + String(FILE_NAME_BUFFER) + " ... ");
+//      int nbByteRead=myFile.read(reader, sizeof(reader)); //int read(void *buf, uint16_t nbyte);
+//      if (nbByteRead != myFile.size())
+//        Serial.println("Not all of the file has been read ");
+        
+      //Serial.println("int read(void *buf, uint16_t nbyte) est passé");
+      //Serial.println("Sizeof reader : " + String(sizeof(reader)));
+           
+//      for(int i=0; i < sizeof(reader); i++){
+//        Serial.println("i = " + String(i) + " reader[i] = " + reader[i]);
+//        if (reader[i] == '\r' || reader[i] == '\n'){
+//          if (reader[i] == '\n'){
+            //Throw '\n'
+//          }else{
+            /*nbLine++;
+            //Serial.println(oneLine);*/
+//            myFile2.println(oneLine);
+//            dataToSend.enqueue(oneLine);
+//            oneLine="";
+//          }
+//        }else{
+//          oneLine+=reader[i];
+//        }
+//      }
+      //Serial.println("La boucle est passé");
+      /*Serial.println("Nombre de ligne dans le fichier " + String(nbLine));*/
+        
+      // close the file:
+//      myFile.close();
+//      myFile2.close();
+//      Serial.println("done.");
+
+//      return dataToSend;
+//    } 
+//  }else{
+//    Queue<String> empty;
+//    return empty;
+//  }
+//}
+Queue<String> QameleO_SD::getDataToSend()
 {
   if(this->wakeupSD()){
     myFile = SD.open(FILE_NAME_BUFFER, FILE_READ);
-    myFile2 = SD.open(FILE_NAME_LOG, FILE_WRITE);
-    if (!myFile || !myFile2){
-      if(!myFile)
-        Serial.println("Error opening " + String(FILE_NAME_BUFFER));
-      if(!myFile2)
-        Serial.println("Error opening " + String(FILE_NAME_LOG));
-      Pile<String> empty;
+    if(!myFile){
+      Serial.println("Error opening " + String(FILE_NAME_BUFFER));
+      
+      Queue<String> empty;
       return empty;
     }else {
       char reader[myFile.size()];
       String oneLine;
-      Pile<String> dataToSend;
+      Queue<String> dataToSend;
       /*int nbLine=0;*/
       
       Serial.println("Reading to " + String(FILE_NAME_BUFFER) + " ... ");
       int nbByteRead=myFile.read(reader, sizeof(reader)); //int read(void *buf, uint16_t nbyte);
       if (nbByteRead != myFile.size())
         Serial.println("Not all of the file has been read ");
-
+        
+      //Serial.println("int read(void *buf, uint16_t nbyte) est passé");
+      //Serial.println("Sizeof reader : " + String(sizeof(reader)));
+           
       for(int i=0; i < sizeof(reader); i++){
+        //Serial.println("i = " + String(i) + " reader[i] = " + reader[i]);
         if (reader[i] == '\r' || reader[i] == '\n'){
           if (reader[i] == '\n'){
             //Throw '\n'
           }else{
             /*nbLine++;
             //Serial.println(oneLine);*/
-            myFile2.println(oneLine);
-            dataToSend.push(oneLine);
+            dataToSend.enqueue(oneLine);
             oneLine="";
           }
         }else{
           oneLine+=reader[i];
         }
       }
+      //Serial.println("La boucle est passé");
       /*Serial.println("Nombre de ligne dans le fichier " + String(nbLine));*/
         
       // close the file:
       myFile.close();
-      myFile2.close();
       Serial.println("done.");
 
       return dataToSend;
     } 
   }else{
-    Pile<String> empty;
+    Queue<String> empty;
     return empty;
   }
 }
@@ -193,7 +270,8 @@ Pile<String> QameleO_SD::getDataToSend()
 bool QameleO_SD::resetFileDataToSend()
 {
   if(this->wakeupSD()){
-    return SD.remove(FILE_NAME_BUFFER); //If the file doesn't exists, that return false, but this methode is use to recreate the file. So, it's no important if that return false
+    Serial.println("Supression du fichier " + String(FILE_NAME_BUFFER));
+    return SD.remove(FILE_NAME_BUFFER); //If the file doesn't exists, that return false, but this methode is use to recreate the file. So, it's not too important if that return false
   }else {
     return false;
   }
@@ -303,7 +381,7 @@ int QameleO_SD::readNbReboot()
 
 /**
  * Used before a reboot of the program. 
- * Call saveMillisInFile() & saveNbRebootInFile(int n)
+ * Call saveMillisInFile() //& saveNbRebootInFile(int n)
  */
 void QameleO_SD::saveOnBackup(int n)
 { 
@@ -311,15 +389,21 @@ void QameleO_SD::saveOnBackup(int n)
 }
 
 /**
- * Call wakeupSD and saveDataIn
+ * Call wakeupSD and saveDataInBufferFile
  * 
- * @param msg - The argument of saveDataIn
+ * @param msg - The argument of saveDataInBufferFile
  */
-void QameleO_SD::saveToSD(String msg)
+void QameleO_SD::saveToSDBuffer(String msg)
 {
   if(this->wakeupSD()) 
-    this->saveDataIn(msg);
+    this->saveDataInBufferFile(msg);
   
+}
+
+void QameleO_SD::saveToSDLog(String msg)
+{
+  if(this->wakeupSD()) 
+    this->saveDataInLogFile(msg);
 }
 
 /**

@@ -9,6 +9,18 @@
 #include "RTClib.h"
 
 /**
+ * When a message is received, this method transmits the message to DataMessage class
+ */
+void callback(char* topic, byte *payload, unsigned int length) {
+  //Pour l'instant elle ne fait rien à par afficher sur la console
+   Serial.println("-------Nouveau message du broker mqtt-----");
+   Serial.print("Canal:");
+   Serial.println(topic);
+   Serial.print("donnee:");
+   Serial.write(payload, length);
+ }
+
+/**
  * Maker of the class
  */
 QameleO_GSM::QameleO_GSM()
@@ -17,12 +29,18 @@ QameleO_GSM::QameleO_GSM()
   this->client = new TinyGsmClient(*this->modem);
   this->mqtt = new PubSubClient(*this->client);
 
-  this->nbSendMeasure = 1;
+  this->nbSendMeasure=1;
+  this->nbUnixTimeReceive=0;
 }
 
 void QameleO_GSM::addOneSendMeasure()
 {
   this->nbSendMeasure++;
+}
+
+void QameleO_GSM::addOneReceiveTime()
+{
+  this->nbUnixTimeReceive++;
 }
 
 /**
@@ -33,9 +51,89 @@ void QameleO_GSM::closeGSM()
   SerialAT.end();
 }
 
+/**
+ * Return the number of SendMeasure
+ */
 unsigned long QameleO_GSM::getNbOfSendMeasure()
 {
   return this->nbSendMeasure;
+}
+
+unsigned long QameleO_GSM::getNbOfUnixTimeReceive()
+{
+  return this->nbUnixTimeReceive;
+}
+
+/**
+ * Connect to the server on topic myTimer and subscribe on it. When a message has been received, callback() is called
+ */
+bool QameleO_GSM::readTheClock()
+{
+  int retry = 3;
+  while (!this->modem->restart()) {
+   if(retry < 0){
+    Serial.println(" void QameleO_GSM::readTheClock(), modem->restart() : fail");
+    return false;
+   }else {
+     Serial.print(" retry ");
+     delay(10000);
+   }
+    retry = retry - 1;
+  }
+  Serial.print("(modem initialized) " );
+  // Unlock your SIM card with a PIN
+  this->modem->simUnlock(GSM_PIN_CODE);
+
+  retry = 3;
+  while (!this->modem->waitForNetwork(NETWORK_REGISTER_TIMEOUT)) {
+   if(retry < 0){
+    Serial.println(" void QameleO_GSM::readTheClock(), modem->waitForNetwork(NETWORK_REGISTER_TIMEOUT) : fail");
+    return false;
+   }else {
+    Serial.print(" retry ");
+   }
+    retry = retry - 1;
+  } 
+  
+  retry = 3;  
+  while(!this->modem->gprsConnect(GSM_APN, "wap", "wapwap")) {
+   if(retry < 0){
+    Serial.println(" void QameleO_GSM::readTheClock(), modem->gprsConnect(GSM_APN, \"wap\", \"wapwap\") : fail");
+    return false;
+   }else{
+    Serial.print(" retry ");
+   }
+    retry = retry - 1;
+  }
+  Serial.print("(connected to network) " );
+  
+  this->mqtt->setServer(GSM_MQTT_BROKER, ***REMOVED***);
+  this->mqtt->setCallback(callback);
+  
+  Serial.print("Connecting to ");
+  Serial.print(GSM_MQTT_BROKER);
+  retry = 3;
+  while (0 == this->mqtt->connect(SENSOR_NAME, "***REMOVED***", "***REMOVED***")) {
+    Serial.print(mqtt->state());
+    if(retry < 0){
+      Serial.println(" void QameleO_GSM::readTheClock(), mqtt->connect(SENSOR_NAME, \"***REMOVED***\", \"***REMOVED***\") : fail");
+      return false;
+    }
+    Serial.print(" retry ");
+    retry = retry - 1;
+  }
+
+  this->mqtt->subscribe("myTimer");
+
+  unsigned long timeBefore = millis();
+  while(this->mqtt->loop()){
+    unsigned long timeToWait = millis() - timeBefore;
+    if (timeToWait >= 10000){  //Disconnect after 10 sec in the loop
+      this->mqtt->disconnect();
+    }
+  }
+  return true;
+  
 }
 
 /**
@@ -163,16 +261,19 @@ bool QameleO_GSM::setupGSM()
   //long rate = 115200;
   int retry = 3 ;
   bool notConnected = true;
- 
+  Serial.println("rate = " + String(rate));
   while(notConnected&&retry>0)
-  {
+  { 
+    //Serial.println("Juste après c'est begin");
     SerialAT.begin(rate);
+    //Serial.println("Juste avant c'était begin");
     delay(3000);
     int nbloop = 20;
     while (notConnected && nbloop > 0) {
       SerialAT.print("AT\r\n");
-      Serial.print("(wait) ");
+      //Serial.print("(wait) ");
       String input = SerialAT.readString();
+      Serial.println("Que dit input ? " + input);
       if (input.indexOf("OK") >= 0) {
         Serial.print(" (responded at rate ");
         Serial.print(rate);
@@ -181,7 +282,7 @@ bool QameleO_GSM::setupGSM()
       }
        delay(1000);
 
-      nbloop = nbloop -1;
+      nbloop = nbloop - 1;
     }
     Serial.println("");
     Serial.println("retry");

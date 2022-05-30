@@ -27,7 +27,7 @@
   * A vérifier mais je ne pense pas que ça soit la place pour le mettre avec le SoftwareSerial */
   #ifdef CONFIG_MEGA
   #define SerialAT Serial2
-  #define TRANSMISSION_RATE 9600 //115200
+  #define TRANSMISSION_RATE 9600 //115200   //9600
   #endif
 /*
   #ifdef CONFIG_UNO
