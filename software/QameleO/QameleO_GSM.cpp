@@ -1,9 +1,10 @@
 #include "QameleO_GSM.h"
 
+#include "DataMessage.h"
 #include "QameleO_hard_conf.h"
 #include "QameleO_struct.h"
 
-#include <arduino.h>
+#include <Arduino.h>
 #include <PubSubClient.h>
 #include <TinyGsmClient.h>
 #include "RTClib.h"
@@ -13,11 +14,13 @@
  */
 void callback(char* topic, byte *payload, unsigned int length) {
   //Pour l'instant elle ne fait rien à par afficher sur la console
-   Serial.println("-------Nouveau message du broker mqtt-----");
-   Serial.print("Canal:");
-   Serial.println(topic);
-   Serial.print("donnee:");
-   Serial.write(payload, length);
+  //Serial.println("-------Nouveau message du broker mqtt-----");
+  //Serial.print("Canal:");
+  //Serial.println(topic);
+  Serial.println();
+  Serial.print("donnee:");
+  Serial.write(payload, length);
+  DataMessage::setUnixTime(payload);
  }
 
 /**
@@ -93,9 +96,9 @@ bool QameleO_GSM::readTheClock()
     Serial.print(" retry ");
    }
     retry = retry - 1;
-  } 
-  
-  retry = 3;  
+  }
+
+  retry = 3;
   while(!this->modem->gprsConnect(GSM_APN, "wap", "wapwap")) {
    if(retry < 0){
     Serial.println(" void QameleO_GSM::readTheClock(), modem->gprsConnect(GSM_APN, \"wap\", \"wapwap\") : fail");
@@ -106,10 +109,10 @@ bool QameleO_GSM::readTheClock()
     retry = retry - 1;
   }
   Serial.print("(connected to network) " );
-  
+
   this->mqtt->setServer(GSM_MQTT_BROKER, ***REMOVED***);
   this->mqtt->setCallback(callback);
-  
+
   Serial.print("Connecting to ");
   Serial.print(GSM_MQTT_BROKER);
   retry = 3;
@@ -133,12 +136,12 @@ bool QameleO_GSM::readTheClock()
     }
   }
   return true;
-  
+
 }
 
 /**
  * Send the message create
- * 
+ *
  * @param msg - The message to send
  * @return true if it's a sucess, false if there are a problem
  */
@@ -178,9 +181,9 @@ bool QameleO_GSM::sendData(String msg)
           Serial.print(" retry ");
     }
     retry = retry - 1;
-  } 
+  }
   //String gsmTime = modem.getGSMDateTime(DATE_TIME);
-  retry = 3;  
+  retry = 3;
   while(!this->modem->gprsConnect(GSM_APN, "wap", "wapwap")) {
    if(retry < 0)
    {
@@ -213,16 +216,16 @@ bool QameleO_GSM::sendData(String msg)
     retry = retry - 1;
   }
   Serial.println(" OK");
-  
+
   if(msg.length() <= 0)
   {
       Serial.println(" Le message est ne contient pas de caratère, il n'y a rien à envoyer");
       return false;
   }
-  unsigned int bufSize = msg.length() + 1; 
+  unsigned int bufSize = msg.length() + 1;
   char cmessage[bufSize];
   msg.toCharArray(cmessage, bufSize);
-  Serial.print("to send");
+  Serial.print("to send ");
   Serial.println(cmessage);
   //char cmessage[50];
   //msg.toCharArray(cmessage,50);
@@ -237,7 +240,7 @@ bool QameleO_GSM::sendData(String msg)
     }
     else{
       Serial.print(" retry ");
-      retry = retry - 1; 
+      retry = retry - 1;
     }
   }
   if(retry >= 0)
@@ -248,7 +251,7 @@ bool QameleO_GSM::sendData(String msg)
   }
   this->mqtt->disconnect();
   return false;
-  
+
 }
 
 /**
@@ -261,9 +264,9 @@ bool QameleO_GSM::setupGSM()
   //long rate = 115200;
   int retry = 3 ;
   bool notConnected = true;
-  Serial.println("rate = " + String(rate));
+  //Serial.println("rate = " + String(rate));
   while(notConnected&&retry>0)
-  { 
+  {
     //Serial.println("Juste après c'est begin");
     SerialAT.begin(rate);
     //Serial.println("Juste avant c'était begin");
@@ -273,7 +276,7 @@ bool QameleO_GSM::setupGSM()
       SerialAT.print("AT\r\n");
       //Serial.print("(wait) ");
       String input = SerialAT.readString();
-      Serial.println("Que dit input ? " + input);
+      //Serial.println("Que dit input ? " + input);
       if (input.indexOf("OK") >= 0) {
         Serial.print(" (responded at rate ");
         Serial.print(rate);
@@ -299,7 +302,7 @@ bool QameleO_GSM::setupGSM()
     Serial.println(" -- FAILED!");
     delay(500);
     return false;
-    
+
   }
 }
 
@@ -314,19 +317,19 @@ void QameleO_GSM::setupGSM_start()
   pinMode(GSM_RESET, OUTPUT);
   digitalWrite(GSM_RESET, LOW);
   digitalWrite(GSM_OFF, LOW);
-  digitalWrite(GSM_LOWP, HIGH);   
+  digitalWrite(GSM_LOWP, HIGH);
   digitalWrite(GSM_ON, LOW);
 }
 
 /**
- * 
+ *
  */
 void QameleO_GSM::startupGSM()
 {
   digitalWrite(GSM_OFF, LOW);
-  digitalWrite(GSM_LOWP, LOW);  
+  digitalWrite(GSM_LOWP, LOW);
   delay(1000);
-  digitalWrite(GSM_LOWP, HIGH);   
+  digitalWrite(GSM_LOWP, HIGH);
   digitalWrite(GSM_ON, HIGH);
   delay(3000);
   digitalWrite(GSM_ON, LOW);
@@ -334,17 +337,17 @@ void QameleO_GSM::startupGSM()
 }
 
 /**
- * 
+ *
  */
 void QameleO_GSM::stopGSM()
 {
   SerialAT.end();
-  digitalWrite(GSM_LOWP, HIGH);   
+  digitalWrite(GSM_LOWP, HIGH);
   digitalWrite(GSM_ON, LOW);
   digitalWrite(GSM_OFF, HIGH);
-  digitalWrite(GSM_LOWP, LOW);   
+  digitalWrite(GSM_LOWP, LOW);
   delay(1000);
-  digitalWrite(GSM_LOWP, HIGH);   
- 
+  digitalWrite(GSM_LOWP, HIGH);
+
   digitalWrite(GSM_OFF, LOW);
 }

@@ -6,8 +6,8 @@
 // 1 - Configuration GSM
   #define GSM_OFF 9
   #define GSM_LOWP 2
-  #define  GSM_ON 3
-  #define  GSM_RESET 13
+  #define GSM_ON 3
+  #define GSM_RESET 13
   #define TINY_GSM_MODEM_SIM800
   
   #ifndef GSM_PIN_CODE

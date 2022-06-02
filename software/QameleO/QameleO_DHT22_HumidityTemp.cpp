@@ -3,7 +3,7 @@
 #include "QameleO_hard_conf.h"
 #include "HumidityTempSensor.h"
 
-#include <arduino.h>
+#include <Arduino.h>
 #include <DHT.h>
 
 /**
@@ -23,13 +23,13 @@ void QameleO_DHT22_HumidityTemp::runProcess()
   delay(3000);
   Serial.print("Humidity is mesuring ...  ");
   this->humidity = (this->dht->readHumidity());
-  this->temperature = (this->dht->readTemperature()); 
+  this->temperature = (this->dht->readTemperature());
   Serial.print("(temperature : ");
   Serial.print(this->temperature);
   Serial.print(") (humidity: ");
   Serial.print(this->humidity);
   Serial.println(") -- OK!");
-  
+
   digitalWrite(HUMIDITY_TEMP_SWITCH_PIN,LOW);
 }
 

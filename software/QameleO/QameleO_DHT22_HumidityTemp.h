@@ -4,19 +4,19 @@
 #include "HumidityTempSensor.h"
 #include "QameleO_hard_conf.h"
 
-#include <arduino.h>
+#include <Arduino.h>
 #include <DHT.h>
 
 class QameleO_DHT22_HumidityTemp : public HumidityTempSensor
 {
-  private: 
+  private:
 
     /**
-     * 
+     *
      */
     DHT * dht;
 
-  public: 
+  public:
     /**
      * Maker of class
      */

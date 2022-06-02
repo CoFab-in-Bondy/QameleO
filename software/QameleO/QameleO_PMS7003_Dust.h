@@ -5,18 +5,18 @@
 #include "QameleO_hard_conf.h"
 #include "QameleO_struct.h"
 
-#include <arduino.h>
+#include <Arduino.h>
 #include "PMS7003.h"
 
 class QameleO_PMS7003_Dust : public DustSensor
 {
-  private: 
+  private:
     /**
-     * 
+     *
      */
     PMS7003 *pms;
 
-  public: 
+  public:
     /**
      * Maker of the class
      */

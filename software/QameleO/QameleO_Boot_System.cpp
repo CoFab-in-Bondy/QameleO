@@ -2,8 +2,8 @@
 
 
 #include "QameleO_SD.h"
-#include <arduino.h>
-#include <MsTimer2.h>       
+#include <Arduino.h>
+#include <MsTimer2.h>
 #include <avr/wdt.h>
 
 QameleO_Boot_System syst;
@@ -94,7 +94,7 @@ void QameleO_Boot_System::reboot_now()
 }
 
 /**
- * Call saveOnBackup() 
+ * Call saveOnBackup()
  */
 void QameleO_Boot_System::saveTimeSpent()
 {

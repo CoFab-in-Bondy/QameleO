@@ -36,9 +36,9 @@
 
 
 
-#define MEASURE_PERIOD 1            // Temps en minutes     //default = 15
-#define SEND_PERIOD 4               // Temps en minutes     //default = 60
-#define RECEIVE_UNIXTIME_PERIOD 240 // Temps en minutes     //default = 240
+#define MEASURE_PERIOD 1            // Time in minutes     //default = 15
+#define SEND_PERIOD 4               // Time in minutes     //default = 60
+#define RECEIVE_UNIXTIME_PERIOD 240 // Time in minutes     //default = 240
 
 
 // XXX - DEFINE REBOOT DELAY

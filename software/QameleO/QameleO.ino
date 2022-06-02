@@ -190,9 +190,9 @@ void loop() {
         String tmpString = dataToSend.dequeue();
         mySD.saveToSDLog(myDataMsg.haveUnixTime(tmpString,timerSystem.getNbReboot()));
         if (myGSM.sendData(myDataMsg.haveNegativeClock(tmpString,timerSystem.getNbReboot()))){
-          Serial.println(" The data has been send.");
+          Serial.println("The data has been send.");
         } else {
-          Serial.println(" Failed, the data hasn't been send.");
+          Serial.println("Failed, the data hasn't been send.");
         } 
       }
       mySD.resetFileDataToSend();
@@ -210,5 +210,11 @@ void loop() {
   // delay(16 * 60000);
   timerSystem.stopMyWatchdog();
   unsigned long to_wait = millis() - startAcquire;
-  delay(MEASURE_PERIOD * 60000 - to_wait);
+  long tmpBasilic = MEASURE_PERIOD * 60000 - to_wait;
+  //long tmpEpervier = tmpBasilic/60000;
+  //Serial.println("to_wait : " + String(to_wait));
+  //Serial.println("Temps à attendre en minutes : " + String(tmpEpervier));
+  //Serial.println("Temps réel d'attente : " + String(tmpBasilic));
+  if (tmpBasilic > 0)
+    delay(tmpBasilic);
 }

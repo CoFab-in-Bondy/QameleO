@@ -1,7 +1,7 @@
 #include "QameleO_Fan.h"
 
 #include "QameleO_hard_conf.h"
-#include <arduino.h>
+#include <Arduino.h>
 
 /**
  * Maker of the class

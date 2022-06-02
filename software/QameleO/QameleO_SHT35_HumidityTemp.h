@@ -4,19 +4,19 @@
 #include "HumidityTempSensor.h"
 #include "QameleO_hard_conf.h"
 
-#include <arduino.h>
+#include <Arduino.h>
 #include "Seeed_SHT35.h"
 
 class QameleO_SHT35_HumidityTemp : public HumidityTempSensor
 {
-  private: 
+  private:
     /**
-     * 
+     *
      */
     SHT35 *sensor;
 
   public:
-  
+
     /**
      * Maker of the class
      */

@@ -4,7 +4,7 @@
 #include "QameleO_struct.h"
 #include "QameleO_SD.h"
 
-#include <arduino.h>
+#include <Arduino.h>
 #include "RTClib.h"
 
 /**
@@ -16,15 +16,15 @@ DataMessage::DataMessage()
   this->messageID=0;
   #if defined(NextPM_SENSOR) || defined (PMS7003_SENSOR)
     this->dustSensor = true;
-  #else 
+  #else
     this->dustSensor = false;
-  #endif 
-  #if defined(DHT_SENSOR) || defined(SHT_SENSOR) 
+  #endif
+  #if defined(DHT_SENSOR) || defined(SHT_SENSOR)
     this->humTempSensor = true;
-  #else 
+  #else
     this->humTempSensor = false;
   #endif
-  
+
   /*startTime = 0; // date de départ en seconde
   initOffset = 1000000000; // date de départ en seconde
   lastUpdate = 1000000000;*/
@@ -34,7 +34,7 @@ unsigned long DataMessage::unixTime = 0;
 
 /**
  * Add a time on the string
- * 
+ *
  * @param data  - The string with the sensor data
  * @param nbReboot - The number of reboot
  */
@@ -47,7 +47,7 @@ String DataMessage::buildCaptureMessage(String data, int nbReboot)
     if(retry < 0)
       return "";
   }*/
-  
+
   this->messageID = this->messageID + 1;
   String sid = String(this->messageID);
   //uint32_t cdate = (millis() - lastUpdate ) / 1000 + startTime;
@@ -57,7 +57,7 @@ String DataMessage::buildCaptureMessage(String data, int nbReboot)
 
 
   String msg = sdate + ";";
-  msg += String(nbReboot) + ";"; 
+  msg += String(nbReboot) + ";";
   msg += SENSOR_NAME;
   msg += ";" + sid + ";";
   msg += data;
@@ -66,7 +66,7 @@ String DataMessage::buildCaptureMessage(String data, int nbReboot)
 
 /**
  * Create a string with the data collected
- * 
+ *
  * @param data - The struct QameleO_measure, use to get the data
  * @param nbReboot - The number of reboot
  */
@@ -85,14 +85,14 @@ String DataMessage::createMessage(QameleO_measure data, int nbReboot)
   #ifdef NextPM_SENSOR
     m = m + ":" + String(data.humidityNextPM) + ":" + String(data.temperatureNextPM);
   #endif
-  
+
   this->message =  buildCaptureMessage(m, nbReboot);
   return this->message;
 }
 
 /**
  * Replace the message clock with a negative clock
- * 
+ *
  * @param msg - The String where to put the negative clock
  * @param nbRebootMax - the number of program restarts
  * @return the changed message
@@ -105,7 +105,7 @@ String DataMessage::haveNegativeClock(String msg, int nbRebootMax)
   long clockLong;
   char buf[msg.length()+1];
   msg.toCharArray(buf,msg.length()+1);
-  
+
   for(int i=0;i<sizeof(buf) && check!=2 ;i++){
     //Serial.print(buf[i]);
     if (buf[i]==';' || buf[i]=='$'){
@@ -126,19 +126,19 @@ String DataMessage::haveNegativeClock(String msg, int nbRebootMax)
   clockLong = clockString.toInt() - sd.readBackup(idRebootString.toInt(), nbRebootMax);
   /*Serial.println("Quasiment le tps utilisé " + String(millis()));
   Serial.println("Horloge négative : " + String(clockLong));*/
-    
+
   /*//Serial.println("");
   //Serial.println(msg);
   Serial.println("Ancien message : " + msg);
   String msgSaved = msg.substring(msg.indexOf(";"));
   Serial.println("Nouveau message, prêt pour qu'on ajoute l'horloge négative : " + msgSaved);*/
-  
+
   return String(clockLong)+msg.substring(msg.indexOf(";",msg.indexOf(";")+1));
 }
 
 /**
  * Replace the message clock with the unix time
- * 
+ *
  * @param msg - the String where to put the unix time
  * @param nbRebootMax - the number of program restarts
  * @return the changed message
@@ -151,7 +151,7 @@ String DataMessage::haveUnixTime(String msg, int nbRebootMax)
   long newTime;
   char buf[msg.length()+1];
   msg.toCharArray(buf,msg.length()+1);
-  
+
   for(int i=0;i<sizeof(buf) && check!=2 ;i++){
     //Serial.print(buf[i]);
     if (buf[i]==';' || buf[i]=='$'){
@@ -163,7 +163,7 @@ String DataMessage::haveUnixTime(String msg, int nbRebootMax)
         idRebootString += buf[i];
     }
   }
-  
+
   QameleO_SD sd;
   newTime = clockString.toInt() + sd.readBackup(idRebootString.toInt(), nbRebootMax);
   newTime = newTime/1000;   //To have the time in second
@@ -174,17 +174,18 @@ String DataMessage::haveUnixTime(String msg, int nbRebootMax)
 
 /**
  * Set the unix time to use
- * 
+ *
  * @param n - the unix time to use
  */
-void DataMessage::setUnixTime(unsigned long n)
+static void DataMessage::setUnixTime(unsigned long n)
 {
-  this->unixTime = n;
+  unixTime = n;
+  Serial.println(String(unixTime));
 }
 
 bool DataMessage::unixTimeIsSet()
 {
-  if(this->unixTime > 0){
+  if(unixTime > 0){
     return true;
   }else {
     return false;
