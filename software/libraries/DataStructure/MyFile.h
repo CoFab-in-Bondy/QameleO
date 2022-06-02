@@ -4,14 +4,14 @@
 #include "Maillon.h"
 
 template<typename E>
-class MyFile
+class Queue
 {
 	private:
 		Maillon<E> *first;
 		Maillon<E> *last;
 
 	public:
-		MyFile();
+		Queue();
 		void enqueue(E e1);
 		E dequeue();
 		bool isEmpty();

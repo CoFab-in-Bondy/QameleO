@@ -5,14 +5,14 @@
 #include <stdlib.h>
 
 template<typename E>
-MyFile<E>::MyFile()
+Queue<E>::Queue()
 {
 	this->first=NULL;
 	this->last=NULL;
 }
 
 template<typename E>
-void MyFile<E>::enqueue(E e1)
+void Queue<E>::enqueue(E e1)
 {
 	//printf("J'entre avec difficulté %d\n", e1);
 	if (this->first==NULL){
@@ -28,7 +28,7 @@ void MyFile<E>::enqueue(E e1)
 }
 
 template<typename E>
-E MyFile<E>::dequeue()
+E Queue<E>::dequeue()
 {
 	E toDequeue = this->first->getValue();
 
@@ -40,7 +40,7 @@ E MyFile<E>::dequeue()
 }
 
 template<typename E>
-bool MyFile<E>::isEmpty()
+bool Queue<E>::isEmpty()
 {
 	if (this->first==NULL){
 		return true;
