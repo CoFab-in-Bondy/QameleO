@@ -5,22 +5,22 @@
 #include "QameleO_hard_conf.h"
 #include "QameleO_struct.h"
 
-#include <arduino.h>
+#include <Arduino.h>
 #include "NextPM.h"
 
 class QameleO_NextPM_Dust : public DustSensor
 {
-  private : 
+  private :
 
     /**
-     * 
+     *
      */
     NextPM *pms;
 
     float temperature;
     float humidity;
 
-  public : 
+  public :
     /**
      * Maker of the class
      */
@@ -30,7 +30,7 @@ class QameleO_NextPM_Dust : public DustSensor
      * Close the sensor
      */
     void closeDustSensor();
-    
+
     /**
      * Collect the sensor's data
      */

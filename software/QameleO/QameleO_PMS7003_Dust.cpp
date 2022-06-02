@@ -4,7 +4,7 @@
 #include "DustSensor.h"
 #include "QameleO_struct.h"
 
-#include <arduino.h>
+#include <Arduino.h>
 #include "PMS7003.h"
 
 /**

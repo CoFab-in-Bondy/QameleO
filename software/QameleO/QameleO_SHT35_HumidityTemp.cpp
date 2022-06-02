@@ -3,7 +3,7 @@
 #include "HumidityTempSensor.h"
 #include "QameleO_hard_conf.h"
 
-#include <arduino.h>
+#include <Arduino.h>
 #include "Seeed_SHT35.h"
 
 /**

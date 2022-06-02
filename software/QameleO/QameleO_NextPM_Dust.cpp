@@ -4,7 +4,7 @@
 #include "DustSensor.h"
 #include "QameleO_struct.h"
 
-#include <arduino.h>
+#include <Arduino.h>
 #include "NextPM.h"
 
 /**
@@ -61,7 +61,7 @@ void QameleO_NextPM_Dust::runDustSensorData()
   }
 
   /*if (this->pms->readTempHumi(float & temp, float & humidity)){
-    
+
   } else {
     Serial.println("-- readTempHumi() Failed!");
   } */
@@ -71,8 +71,8 @@ void QameleO_NextPM_Dust::runDustSensorData()
 
 void QameleO_NextPM_Dust::runDustSensorData(QameleO_measure &measure)
 {
-  
-  
+
+
   Serial.print("Dust is mesuring... ");
   Serial.print("(wake up and wait for stable readings) ");
   Serial.print("(Send request read) ");
@@ -98,9 +98,9 @@ void QameleO_NextPM_Dust::runDustSensorData(QameleO_measure &measure)
   {
     Serial.println("-- Failed!");
   }
-  
+
   if (this->pms->readTempHumi( temperature, humidity)){
-    
+
     measure.temperatureNextPM = temperature;
     measure.humidityNextPM = humidity;
     Serial.print("Measure Temperature nextPM : ");
@@ -108,7 +108,7 @@ void QameleO_NextPM_Dust::runDustSensorData(QameleO_measure &measure)
     Serial.print(" -- ");
     Serial.print("Measure Humidity nextPM : ");
     Serial.print(measure.humidityNextPM);
-    Serial.println(" -- OK!");  
+    Serial.println(" -- OK!");
 
   } else {
     Serial.println("-- QameleO_NextPM:readTempHumi() Failed!");
