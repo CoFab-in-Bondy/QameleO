@@ -3,11 +3,16 @@
 
 
 // 1 - DEFINE THE NAME OF THE QameleO ACCORDING to the DATABASE
+#define VALUE_TO_STRING(x) #x
+#define VALUE(x) VALUE_TO_STRING(x)
+#define VAR_NAME_VALUE(var) #var "="  VALUE(var)
+
 
 //#define TOKEN "zaidoaiuzbfdubzaod"
 #ifndef TOKEN
     #error You must define a TOKEN
 #endif
+#pragma message(VAR_NAME_VALUE(TOKEN))
 
 // 2 - DEFINE QameleO INTERNAL COMPONENTS
 
@@ -39,6 +44,11 @@
 #endif
 
 #define CONFIG_MEGA
+
+#pragma message(VAR_NAME_VALUE(DHT_SENSOR))
+#pragma message(VAR_NAME_VALUE(SHT_SENSOR))
+#pragma message(VAR_NAME_VALUE(NextPM_SENSOR))
+#pragma message(VAR_NAME_VALUE(PMS7003_SENSOR))
  
 
 // 3 - DEFINE log system
