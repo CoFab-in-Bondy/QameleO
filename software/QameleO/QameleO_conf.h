@@ -4,9 +4,9 @@
 
 // 1 - DEFINE THE NAME OF THE QameleO ACCORDING to the DATABASE
 
-//#define SENSOR_NAME "Name"
-#ifndef SENSOR_NAME
-    #error You must enter a name
+//#define TOKEN "zaidoaiuzbfdubzaod"
+#ifndef TOKEN
+    #error You must define a TOKEN
 #endif
 
 // 2 - DEFINE QameleO INTERNAL COMPONENTS
