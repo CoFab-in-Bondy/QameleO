@@ -8,11 +8,12 @@
 #define VAR_NAME_VALUE(var) #var "="  VALUE(var)
 
 
-//#define TOKEN "zaidoaiuzbfdubzaod"
-#ifndef TOKEN
-    #error You must define a TOKEN
+//#define SENSOR_NAME "zaidoaiuzbfdubzaod"
+#ifndef SENSOR_NAME
+    #error You must define a SENSOR_NAME
 #endif
-#pragma message(VAR_NAME_VALUE(TOKEN))
+#pragma message(VAR_NAME_VALUE(SENSOR_NAME))
+#pragma message(VAR_NAME_VALUE(SENSOR_NAME))
 
 // 2 - DEFINE QameleO INTERNAL COMPONENTS
 
@@ -25,10 +26,14 @@
 
 // Default values
 #ifndef DHT_SENSOR
-    #define SHT_SENSOR
+    #ifndef SHT_SENSOR
+        #define SHT_SENSOR
+    #endif
 #endif
 #ifndef PMS7003_SENSOR
-    #define NextPM_SENSOR
+    #ifndef NextPM_SENSOR
+        #define NextPM_SENSOR
+    #endif
 #endif
 
 // Check duplicate
