@@ -98,7 +98,7 @@ void loop() {
 
   //Collect Data
   //---------------------//
-  //myFan.runFanProcess();      // <----------- à décommenter 
+  myFan.runFanProcess();      // <----------- à décommenter 
   
   #if defined(NextPM_SENSOR) || defined (PMS7003_SENSOR)
     myDustSensor->runDustSensorData(sensorData);
