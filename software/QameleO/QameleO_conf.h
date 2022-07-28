@@ -12,8 +12,6 @@
 #ifndef SENSOR_NAME
     #error You must define a SENSOR_NAME
 #endif
-#pragma message(VAR_NAME_VALUE(SENSOR_NAME))
-#pragma message(VAR_NAME_VALUE(SENSOR_NAME))
 
 // 2 - DEFINE QameleO INTERNAL COMPONENTS
 
@@ -50,11 +48,6 @@
 
 #define CONFIG_MEGA
 
-#pragma message(VAR_NAME_VALUE(DHT_SENSOR))
-#pragma message(VAR_NAME_VALUE(SHT_SENSOR))
-#pragma message(VAR_NAME_VALUE(NextPM_SENSOR))
-#pragma message(VAR_NAME_VALUE(PMS7003_SENSOR))
- 
 
 // 3 - DEFINE log system
 
@@ -90,7 +83,7 @@
     #define GSM_PASS ""
 #endif
 #ifndef GSM_MQTT_BROKER
-    #define GSM_MQTT_BROKER "vmpams.ird.fr"
+    #define GSM_MQTT_BROKER ""
 #endif
 
 #ifndef MEASURE_PERIOD
