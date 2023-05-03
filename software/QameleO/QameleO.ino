@@ -114,7 +114,6 @@ void loop() {
   #endif
   //---------------------//
 
-
   //Create Message with the data
   //---------------------//
   String dte = myDataMsg.createMessage(sensorData, timerSystem.getNbReboot());
@@ -189,7 +188,7 @@ void loop() {
       while(!dataToSend.isEmpty()){
         String tmpString = dataToSend.dequeue();
         mySD.saveToSDLog(myDataMsg.haveUnixTime(tmpString,timerSystem.getNbReboot()));
-        if (myGSM.sendData(myDataMsg.haveNegativeClock(tmpString,timerSystem.getNbReboot()))){
+        if (myGSM.sendData(myDataMsg.haveNegativeClock(tmpString,timerSystem.getNbReboot()), dataToSend.isEmpty())){
           Serial.println("The data has been send.");
         } else {
           Serial.println("Failed, the data hasn't been send.");
@@ -215,6 +214,9 @@ void loop() {
   //Serial.println("to_wait : " + String(to_wait));
   //Serial.println("Temps à attendre en minutes : " + String(tmpEpervier));
   //Serial.println("Temps réel d'attente : " + String(tmpBasilic));
-  if (tmpBasilic > 0)
+
+  if (tmpBasilic > 0){
     delay(tmpBasilic);
+  }
+
 }

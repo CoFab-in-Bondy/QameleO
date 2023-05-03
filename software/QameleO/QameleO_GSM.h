@@ -19,6 +19,7 @@ class QameleO_GSM
     TinyGsmClient *client;
     TinyGsm *modem;
     PubSubClient *mqtt;
+    bool is_connected;
 
     /**
      * Contians the number of times that data has been sent by the GSM system
@@ -75,7 +76,7 @@ class QameleO_GSM
      * @param msg - The message to send
      * @return true if it's a sucess, false if there are a problem
      */
-    bool sendData(String msg);
+    bool sendData(String msg, bool is_last);
 
     /**
      * Try the connection and if is a success, start it
