@@ -31,7 +31,7 @@ QameleO_GSM::QameleO_GSM()
   this->modem = new TinyGsm(SerialAT);
   this->client = new TinyGsmClient(*this->modem);
   this->mqtt = new PubSubClient(*this->client);
-
+  this->is_connected = false;
   this->nbSendMeasure=1;
   this->nbUnixTimeReceive=0;
 }
@@ -134,7 +134,7 @@ bool QameleO_GSM::readTheClock()
     if (timeToWait >= 10000){  //Disconnect after 10 sec in the loop
       this->mqtt->disconnect();
     }
-  }
+  } 
   return true;
 
 }
@@ -145,78 +145,81 @@ bool QameleO_GSM::readTheClock()
  * @param msg - The message to send
  * @return true if it's a sucess, false if there are a problem
  */
-bool QameleO_GSM::sendData(String msg)
+bool QameleO_GSM::sendData(String msg, bool is_last)
 {
   //setupGSM();
   // Restart takes quite some time
   // To skip it, call init() instead of restart()
   Serial.print("data is sending... " );
   int retry = 3;
-  while (!this->modem->restart()) {
-   if(retry < 0)
-   {
-    Serial.println(" bool QameleO_GSM::sendData(String msg), modem->restart() : fail");
-    return false;
-   }
-    else
-    {
-          Serial.print(" retry ");
-          delay(10000);
-    }
-    retry = retry - 1;
-  }
-  Serial.print("(modem initialized) " );
-  // Unlock your SIM card with a PIN
-  this->modem->simUnlock(GSM_PIN_CODE);
-
-   retry = 3;
-  while (!this->modem->waitForNetwork(NETWORK_REGISTER_TIMEOUT)) {
-   if(retry < 0)
-   {
-    Serial.println(" bool QameleO_GSM::sendData(String msg), modem->waitForNetwork(NETWORK_REGISTER_TIMEOUT) : fail");
-    return false;
-   }
-    else
-    {
-          Serial.print(" retry ");
-    }
-    retry = retry - 1;
-  }
-  //String gsmTime = modem.getGSMDateTime(DATE_TIME);
-  retry = 3;
-  while(!this->modem->gprsConnect(GSM_APN, "wap", "wapwap")) {
-   if(retry < 0)
-   {
-    Serial.println(" bool QameleO_GSM::sendData(String msg), modem->gprsConnect(GSM_APN, \"wap\", \"wapwap\") : fail");
-    return false;
-   }
-    else
-    {
-          Serial.print(" retry ");
-    }
-    retry = retry - 1;
-  }
-  Serial.print("(connected to network) " );
-  this->mqtt->setServer(GSM_MQTT_BROKER, ***REMOVED***);
-  Serial.print("Connecting to ");
-  Serial.print(GSM_MQTT_BROKER);
-  retry = 3;
-  while (0 == this->mqtt->connect(SENSOR_NAME, "***REMOVED***", "***REMOVED***")) {
-    Serial.print(mqtt->state());
+  if(!is_connected){
+    while (!this->modem->restart()) {
     if(retry < 0)
     {
-      Serial.println(" bool QameleO_GSM::sendData(String msg), mqtt->connect(SENSOR_NAME, \"***REMOVED***\", \"***REMOVED***\") : fail");
+      Serial.println(" bool QameleO_GSM::sendData(String msg), modem->restart() : fail");
       return false;
     }
-    else
-    {
-      Serial.print(" retry ");
+      else
+      {
+            Serial.print(" retry ");
+            delay(10000);
+      }
+      retry = retry - 1;
     }
+    Serial.print("(modem initialized) " );
+    // Unlock your SIM card with a PIN
+    this->modem->simUnlock(GSM_PIN_CODE);
 
-    retry = retry - 1;
+    retry = 3;
+    while (!this->modem->waitForNetwork(NETWORK_REGISTER_TIMEOUT)) {
+    if(retry < 0)
+    {
+      Serial.println(" bool QameleO_GSM::sendData(String msg), modem->waitForNetwork(NETWORK_REGISTER_TIMEOUT) : fail");
+      return false;
+    }
+      else
+      {
+            Serial.print(" retry ");
+      }
+      retry = retry - 1;
+    }
+    //String gsmTime = modem.getGSMDateTime(DATE_TIME);
+    retry = 3;
+    while(!this->modem->gprsConnect(GSM_APN, "wap", "wapwap")) {
+    if(retry < 0)
+    {
+      Serial.println(" bool QameleO_GSM::sendData(String msg), modem->gprsConnect(GSM_APN, \"wap\", \"wapwap\") : fail");
+      return false;
+    }
+      else
+      {
+            Serial.print(" retry ");
+      }
+      retry = retry - 1;
+    }
+    Serial.print("(connected to network) " );
+    this->mqtt->setServer(GSM_MQTT_BROKER, ***REMOVED***);
+    Serial.print("Connecting to ");
+    Serial.print(GSM_MQTT_BROKER);
+    retry = 3;
+    while (0 == this->mqtt->connect(SENSOR_NAME, "***REMOVED***", "***REMOVED***")) {
+      Serial.print(mqtt->state());
+      if(retry < 0)
+      {
+        Serial.println(" bool QameleO_GSM::sendData(String msg), mqtt->connect(SENSOR_NAME, \"***REMOVED***\", \"***REMOVED***\") : fail");
+        return false;
+      }
+      else
+      {
+        Serial.print(" retry ");
+      }
+
+      retry = retry - 1;
+    }
+    Serial.println(" OK");
+    is_connected = true;
   }
-  Serial.println(" OK");
-
+  
   if(msg.length() <= 0)
   {
       Serial.println(" Le message est ne contient pas de caratère, il n'y a rien à envoyer");
@@ -246,10 +249,15 @@ bool QameleO_GSM::sendData(String msg)
   if(retry >= 0)
   {
     Serial.println("sent OK");
-    this->mqtt->disconnect();
+    if(is_last){
+      this->mqtt->disconnect();
+      is_connected = false;
+    }
+    
     return true;
   }
   this->mqtt->disconnect();
+  is_connected = false;
   return false;
 
 }
@@ -274,9 +282,9 @@ bool QameleO_GSM::setupGSM()
     int nbloop = 20;
     while (notConnected && nbloop > 0) {
       SerialAT.print("AT\r\n");
-      //Serial.print("(wait) ");
+      Serial.print("(wait) ");
       String input = SerialAT.readString();
-      //Serial.println("Que dit input ? " + input);
+      Serial.println("Que dit input ? " + input);
       if (input.indexOf("OK") >= 0) {
         Serial.print(" (responded at rate ");
         Serial.print(rate);
