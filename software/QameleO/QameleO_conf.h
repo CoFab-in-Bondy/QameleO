@@ -11,7 +11,11 @@
   
 
 //GSM TO CONFIGURE
-//#define GSM_MQTT_BROKER "***REMOVED***"
+//#define GSM_MQTT_BROKER ""
+//#define GSM_PASS ""
+//#define GSM_USER ""
+//#define GSM_APN "orange"
+//#define GSM_PIN_CODE "0000"
 
 // 1 - DEFINE THE NAME OF THE QameleO ACCORDING to the DATABASE
 #define VALUE_TO_STRING(x) #x
