@@ -34,8 +34,8 @@ class DataMessage
      */
     static unsigned long unixTime;
 
-    /*uint32_t startTime;
-    unsigned long initOffset;
+    static uint32_t lastUpdateTimeClock;
+    /*unsigned long initOffset;
     unsigned long lastUpdate;*/
 
     /**
@@ -97,7 +97,7 @@ class DataMessage
       */
      bool unixTimeIsSet();
 
-
+    static unsigned long getUnixTime();
 };
 
 #endif //DATAMESSAGE_H

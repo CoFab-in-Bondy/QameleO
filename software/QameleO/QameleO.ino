@@ -65,6 +65,7 @@ void setup() {
   #endif
   
   mySD.setupSD();
+  mySD.resetFileDataToSend();
   timerSystem.setNbReboot();
 
   delay(1000);
@@ -118,7 +119,7 @@ void loop() {
   //---------------------//
   String dte = myDataMsg.createMessage(sensorData, timerSystem.getNbReboot());
   Serial.println("Message crée : " + dte);
-  //Serial.println(myDataMsg.haveNegativeClock(dte));
+  
   //---------------------//
 
 
@@ -173,7 +174,6 @@ void loop() {
   }
   //---------------------//
   
-  
   //Send Party with GSM
   //---------------------//
   tmpTime = millis() - myGSM.getNbOfSendMeasure()*60000*SEND_PERIOD; //60000 = 1 min
@@ -188,7 +188,7 @@ void loop() {
       while(!dataToSend.isEmpty()){
         String tmpString = dataToSend.dequeue();
         mySD.saveToSDLog(myDataMsg.haveUnixTime(tmpString,timerSystem.getNbReboot()));
-        if (myGSM.sendData(myDataMsg.haveNegativeClock(tmpString,timerSystem.getNbReboot()), dataToSend.isEmpty())){
+        if (myGSM.sendData(myDataMsg.haveUnixTime(tmpString,timerSystem.getNbReboot()), dataToSend.isEmpty())){
           Serial.println("The data has been send.");
         } else {
           Serial.println("Failed, the data hasn't been send.");

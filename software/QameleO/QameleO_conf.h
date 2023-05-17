@@ -2,13 +2,24 @@
 #define QAMELEO_CONF_H
 
 
+#define SENSOR_NAME "azerty" 
+
+//MEASURE TIME AND SEND DATA TIME
+#define MEASURE_PERIOD 15
+#define SEND_PERIOD 60
+#define RECEIVE_UNIXTIME_PERIOD 240
+  
+
+//GSM TO CONFIGURE
+//#define GSM_MQTT_BROKER "mqtt.qameleo.fr"
+
 // 1 - DEFINE THE NAME OF THE QameleO ACCORDING to the DATABASE
 #define VALUE_TO_STRING(x) #x
 #define VALUE(x) VALUE_TO_STRING(x)
 #define VAR_NAME_VALUE(var) #var "="  VALUE(var)
 
 
-//#define SENSOR_NAME "zaidoaiuzbfdubzaod"
+
 #ifndef SENSOR_NAME
     #error You must define a SENSOR_NAME
 #endif
@@ -17,9 +28,9 @@
 
 // Configuration
 //#define DHT_SENSOR
-//#define SHT_SENSOR
+#define SHT_SENSOR
 
-//#define NextPM_SENSOR
+#define NextPM_SENSOR
 //#define PMS7003_SENSOR
 
 // Default values
@@ -87,10 +98,10 @@
 #endif
 
 #ifndef MEASURE_PERIOD
-    #define MEASURE_PERIOD 1            // Time in minutes  default = 15
+    #define MEASURE_PERIOD 15            // Time in minutes  default = 15
 #endif
 #ifndef SEND_PERIOD
-    #define SEND_PERIOD 4               // Time in minutes  default = 60
+    #define SEND_PERIOD 60               // Time in minutes  default = 60
 #endif
 #ifndef RECEIVE_UNIXTIME_PERIOD
     #define RECEIVE_UNIXTIME_PERIOD 240 // Time in minutes  default = 240
