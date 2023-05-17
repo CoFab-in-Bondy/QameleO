@@ -24,7 +24,7 @@ SoftwareSerial SerialAT(10, 11);
 
 // 2 - Configuration Fan
 #define FAN_CONTROL_PIN 6
-#define FAN_DELAY 10000 //12000//0
+#define FAN_DELAY 120000
 
 // 3 - Configuration SD
 #define SD_CONTROL_PIN 53
