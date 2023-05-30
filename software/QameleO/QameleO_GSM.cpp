@@ -20,7 +20,7 @@ void callback(char* topic, byte *payload, unsigned int length) {
   Serial.println();
   Serial.print("donnee:");
   Serial.write(payload, length);
-  DataMessage::setUnixTime(payload);
+  DataMessage::setUnixTime(atol(payload));
  }
 
 /**
