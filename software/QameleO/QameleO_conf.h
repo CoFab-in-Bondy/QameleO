@@ -11,7 +11,7 @@
   
 
 //GSM TO CONFIGURE
-define GSM_MQTT_BROKER ""
+//#define GSM_MQTT_BROKER ""
 //#define GSM_PASS ""
 //#define GSM_USER ""
 //#define GSM_APN "orange"
