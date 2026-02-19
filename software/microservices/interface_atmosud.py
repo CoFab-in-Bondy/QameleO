@@ -5,7 +5,7 @@ import time
 import logging
 
 # Atmosud
-TOKEN = "***REMOVED***"
+TOKEN = ""
 URL = "https://api-staging.uspot.probesys.net/observations"
 
 # Qameleo
