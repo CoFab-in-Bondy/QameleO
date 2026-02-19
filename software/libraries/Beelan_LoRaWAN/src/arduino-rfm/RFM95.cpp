@@ -38,7 +38,7 @@
 #if defined(US_915)
   #if defined(SUBND_0)//[902.3 - 903.7] MHz
     static const PROGMEM unsigned char LoRa_TX_Freq[8][3] = {
-      { 0xE1, 0x93, 0x59 }, //Channel [0], 902.3 MHz / 61.035 Hz = 14783321 = 0xE***REMOVED***9
+      { 0xE1, 0x93, 0x59 }, //Channel [0], 902.3 MHz / 61.035 Hz = 14783321 = 0xE19359
       { 0xE1, 0xA0, 0x26 }, //Channel [1], 902.5 MHz / 61.035 Hz = 14786598 = 0xE1A026
       { 0xE1, 0xAC, 0xF3 }, //Channel [2], 902.7 MHz / 61.035 Hz = 14789875 = 0xE1ACF3
       { 0xE1, 0xB9, 0xBF }, //Channel [3], 902.9 MHz / 61.035 Hz = 14793151 = 0xE1B9BF

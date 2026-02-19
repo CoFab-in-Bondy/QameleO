@@ -7,12 +7,12 @@ RECONNECT_RATE = 2
 MAX_RECONNECT_COUNT = 12
 MAX_RECONNECT_DELAY = 60
 
-broker = "***REMOVED***" # adresse du serveur MQTT
-port = ***REMOVED***
-topic = "***REMOVED***" # canal radio
-client_id = "***REMOVED***"
-username = "***REMOVED***"
-password = "***REMOVED***"
+broker = "" # adresse du serveur MQTT
+port = 0
+topic = "" # canal radio
+client_id = ""
+username = ""
+password = ""
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 

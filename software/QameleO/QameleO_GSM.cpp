@@ -110,16 +110,16 @@ bool QameleO_GSM::readTheClock()
   }
   Serial.print("(connected to network) " );
 
-  this->mqtt->setServer(GSM_MQTT_BROKER, ***REMOVED***);
+  this->mqtt->setServer(GSM_MQTT_BROKER, 1935);
   this->mqtt->setCallback(callback);
 
   Serial.print("Connecting to ");
   Serial.print(GSM_MQTT_BROKER);
   retry = 3;
-  while (0 == this->mqtt->connect(SENSOR_NAME, "***REMOVED***", "***REMOVED***")) {
+  while (0 == this->mqtt->connect(SENSOR_NAME, "gamasenseit", "gamasenseit")) {
     Serial.print(mqtt->state());
     if(retry < 0){
-      Serial.println(" void QameleO_GSM::readTheClock(), mqtt->connect(SENSOR_NAME, \"***REMOVED***\", \"***REMOVED***\") : fail");
+      Serial.println(" void QameleO_GSM::readTheClock(), mqtt->connect(SENSOR_NAME, \"gamasenseit\", \"gamasenseit\") : fail");
       return false;
     }
     Serial.print(" retry ");
@@ -198,15 +198,15 @@ bool QameleO_GSM::sendData(String msg, bool is_last)
       retry = retry - 1;
     }
     Serial.print("(connected to network) " );
-    this->mqtt->setServer(GSM_MQTT_BROKER, ***REMOVED***);
+    this->mqtt->setServer(GSM_MQTT_BROKER, 1935);
     Serial.print("Connecting to ");
     Serial.print(GSM_MQTT_BROKER);
     retry = 3;
-    while (0 == this->mqtt->connect(SENSOR_NAME, "***REMOVED***", "***REMOVED***")) {
+    while (0 == this->mqtt->connect(SENSOR_NAME, "gamasenseit", "gamasenseit")) {
       Serial.print(mqtt->state());
       if(retry < 0)
       {
-        Serial.println(" bool QameleO_GSM::sendData(String msg), mqtt->connect(SENSOR_NAME, \"***REMOVED***\", \"***REMOVED***\") : fail");
+        Serial.println(" bool QameleO_GSM::sendData(String msg), mqtt->connect(SENSOR_NAME, \"gamasenseit\", \"gamasenseit\") : fail");
         return false;
       }
       else
@@ -234,7 +234,7 @@ bool QameleO_GSM::sendData(String msg, bool is_last)
   //msg.toCharArray(cmessage,50);
   retry = 3;
   bool notstop = true;
-  while (!this->mqtt->publish("***REMOVED***", cmessage) && notstop)
+  while (!this->mqtt->publish("gamasenseit", cmessage) && notstop)
   {
     if(retry < 0)
     {

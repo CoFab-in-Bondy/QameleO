@@ -9,12 +9,12 @@ TOKEN = ""
 URL = "https://api-staging.uspot.probesys.net/observations"
 
 # Qameleo
-broker = "***REMOVED***" # adresse du serveur MQTT
-port = ***REMOVED***
-topic = "***REMOVED***" # canal radio
-client_id = "***REMOVED***"
-username = "***REMOVED***"
-password = "***REMOVED***"
+broker = "" # adresse du serveur MQTT
+port = 0
+topic = "" # canal radio
+client_id = ""
+username = ""
+password = ""
 
 
 # Variables
