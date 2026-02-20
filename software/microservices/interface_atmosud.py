@@ -1,20 +1,21 @@
 import requests
 from datetime import datetime
 from paho.mqtt import client as mqtt
+import config_interface_atmosud
 import time
 import logging
 
 # Atmosud
-TOKEN = ""
-URL = "https://api-staging.uspot.probesys.net/observations"
+TOKEN = config_interface_atmosud.TOKEN_atmo
+URL = config_interface_atmosud.URL_atmo
 
 # Qameleo
-broker = "" # adresse du serveur MQTT
-port = 0
-topic = "" # canal radio
-client_id = ""
-username = ""
-password = ""
+broker = config_interface_atmosud.broker_qam
+port = config_interface_atmosud.port_qam
+topic = config_interface_atmosud.topic_qam
+client_id = config_interface_atmosud.id_client
+username = config_interface_atmosud.user
+password = config_interface_atmosud.passw
 
 
 # Variables
