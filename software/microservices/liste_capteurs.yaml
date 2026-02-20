@@ -1,0 +1,35 @@
+capteurs:
+  - name: "AIR_QAM01"
+    latitude: 43.437389
+    longitude: 5.495167
+    modele:
+      pente: 0
+      offset: 0
+  
+  - name: "AIR_QAM02"
+    latitude: 43.445361
+    longitude: 5.480111
+    modele:
+      pente: 0
+      offset: 0
+  
+  - name: "AIR_QAM03"
+    latitude: 43.438333
+    longitude: 5.457028
+    modele:
+      pente: 0
+      offset: 0
+  
+  - name: "AIR_QAM04"
+    latitude: 43.45175
+    longitude: 5.496389
+    modele:
+      pente: 0
+      offset: 0
+  
+  - name: "AIR_QAM05"
+    latitude: 43.490056
+    longitude: 5.486556
+    modele:
+      pente: 0
+      offset: 0
