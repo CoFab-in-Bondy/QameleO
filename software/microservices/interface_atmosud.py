@@ -148,11 +148,11 @@ def subscribe(client: mqtt.Client):
                         "latitude" : data_capteurs[DEVICE_UID]['latitude']
                     }
                 ]
-                # headers = {"Content-type": "application/json", "Authorization" : f"Bearer {TOKEN}"}
-                # response = requests.post(URL, json=to_insert, headers=headers)
-                # print("Status code:", response.status_code)
-                # print("Response:", response.text)
-                print(to_insert)
+                headers = {"Content-type": "application/json", "Authorization" : f"Bearer {TOKEN}"}
+                response = requests.post(URL, json=to_insert, headers=headers)
+                print(f"Envoi {DEVICE_UID}")
+                print("Status code:", response.status_code)
+                print("Response:", response.text)
 
             elif parts[1] in liste_capteurs_raw:
                 DEVICE_UID = parts[1]
@@ -202,11 +202,11 @@ def subscribe(client: mqtt.Client):
                         "latitude" : data_capteurs[DEVICE_UID]['latitude']
                     }
                 ]
-                # headers = {"Content-type": "application/json", "Authorization" : f"Bearer {TOKEN}"}
-                # response = requests.post(URL, json=to_insert, headers=headers)
-                # print("Status code:", response.status_code)
-                # print("Response:", response.text)
-                print(to_insert)
+                headers = {"Content-type": "application/json", "Authorization" : f"Bearer {TOKEN}"}
+                response = requests.post(URL, json=to_insert, headers=headers)
+                print(f"Envoi {DEVICE_UID}")
+                print("Status code:", response.status_code)
+                print("Response:", response.text)
 
 
 

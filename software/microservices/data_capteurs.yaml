@@ -1,7 +1,7 @@
 capteurs:
   - name: "AIR_QAM01"
-    latitude: '43.437389'
-    longitude: '5.495167'
+    latitude: 43.437389
+    longitude: 5.495167
     modele_pm2.5:
       mean: 7.1361
       sd: 4.7373
@@ -14,8 +14,8 @@ capteurs:
       b: 9.9969
   
   - name: "AIR_QAM02"
-    latitude: '43.445361'
-    longitude: '5.480111'
+    latitude: '43.490056'
+    longitude: '5.486556'
     modele_pm2.5:
       mean: 0
       sd: 0
@@ -28,8 +28,8 @@ capteurs:
       b: 0
   
   - name: "AIR_QAM03"
-    latitude: '43.438333'
-    longitude: '5.457028'
+    latitude: 43.438333
+    longitude: 5.457028
     modele_pm2.5:
       mean: 0
       sd: 0
@@ -56,8 +56,8 @@ capteurs:
       b: 0
   
   - name: "AIR_QAM05"
-    latitude: '43.490056'
-    longitude: '5.486556'
+    latitude: 43.445361
+    longitude: 5.480111
     modele_pm2.5:
       mean: 578.1084
       sd: 277.4236
