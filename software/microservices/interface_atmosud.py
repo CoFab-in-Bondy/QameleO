@@ -13,8 +13,8 @@ with open("data_capteurs.yaml", 'r') as f:
 data_capteurs = {c['name']: c for c in data['capteurs']}
 
 # liste_capteurs = [capteur['name'] for capteur in data_capteurs]
-liste_capteurs = ['AIR_QAM01','AIR_QAM05']
-liste_capteurs_raw = ['AIR_QAM03'] # capteurs qui n'ont pas besoin de correction
+liste_capteurs = []
+liste_capteurs_raw = ['AIR_QAM01','AIR_QAM02','AIR_QAM03','AIR_QAM04','AIR_QAM05'] 
 
 
 
@@ -82,79 +82,7 @@ def subscribe(client: mqtt.Client):
             raw_data = parts[-1]
             data = raw_data.split(':')
 
-            if parts[1] in liste_capteurs:
-                DEVICE_UID = parts[1]
-                date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                pm10 = float(data[2])
-                pm25 = float(data[1])
-                temp = float(data[4])
-                humidite = float(data[3])
-
-                # Correction PM2.5
-                # params modèle
-                mean = data_capteurs[DEVICE_UID]['modele_pm2.5']['mean']
-                sd = data_capteurs[DEVICE_UID]['modele_pm2.5']['sd']
-                a = data_capteurs[DEVICE_UID]['modele_pm2.5']['a']
-                b = data_capteurs[DEVICE_UID]['modele_pm2.5']['b']
-
-                pm2_5_scaled = (pm25 - mean) / sd
-                new_pm2_5 = round(pm2_5_scaled * a + b,4)
-
-                # Correction PM10
-                # params modèle
-                mean = data_capteurs[DEVICE_UID]['modele_pm10']['mean']
-                sd = data_capteurs[DEVICE_UID]['modele_pm10']['sd']
-                a = data_capteurs[DEVICE_UID]['modele_pm10']['a']
-                b = data_capteurs[DEVICE_UID]['modele_pm10']['b']
-
-                pm10_scaled = (pm10 - mean) / sd
-                new_pm10 = round(pm10_scaled * a + b,4)
-
-                to_insert = [
-                    {
-                        "deviceUid" : DEVICE_UID,
-                        "deviceModelUid" : "qameleo",
-                        "isoCode" : "24",
-                        "happenedAt" : date,
-                        "value" : new_pm10,
-                        "longitude" : data_capteurs[DEVICE_UID]['longitude'],
-                        "latitude" : data_capteurs[DEVICE_UID]['latitude']
-                    },
-                    {
-                        "deviceUid" : DEVICE_UID,
-                        "deviceModelUid" : "qameleo",
-                        "isoCode" : "39",
-                        "happenedAt" : date,
-                        "value" : new_pm2_5,
-                        "longitude" : data_capteurs[DEVICE_UID]['longitude'],
-                        "latitude" : data_capteurs[DEVICE_UID]['latitude']
-                    },
-                    {
-                        "deviceUid" : DEVICE_UID,
-                        "deviceModelUid" : "qameleo",
-                        "isoCode" : "54",
-                        "happenedAt" : date,
-                        "value" : temp,
-                        "longitude" : data_capteurs[DEVICE_UID]['longitude'],
-                        "latitude" : data_capteurs[DEVICE_UID]['latitude']
-                    },
-                    {
-                        "deviceUid" : DEVICE_UID,
-                        "deviceModelUid" : "qameleo",
-                        "isoCode" : "58",
-                        "happenedAt" : date,
-                        "value" : humidite,
-                        "longitude" : data_capteurs[DEVICE_UID]['longitude'],
-                        "latitude" : data_capteurs[DEVICE_UID]['latitude']
-                    }
-                ]
-                headers = {"Content-type": "application/json", "Authorization" : f"Bearer {TOKEN}"}
-                response = requests.post(URL, json=to_insert, headers=headers)
-                print(f"Envoi {DEVICE_UID}")
-                print("Status code:", response.status_code)
-                print("Response:", response.text)
-
-            elif parts[1] in liste_capteurs_raw:
+            if parts[1] in liste_capteurs_raw:
                 DEVICE_UID = parts[1]
                 date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 pm10 = float(data[2])

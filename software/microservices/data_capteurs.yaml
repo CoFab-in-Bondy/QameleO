@@ -2,69 +2,24 @@ capteurs:
   - name: "AIR_QAM01"
     latitude: 43.437389
     longitude: 5.495167
-    modele_pm2.5:
-      mean: 7.1361
-      sd: 4.7373
-      a: 4.0921
-      b: 6.1615
-    modele_pm10:
-      mean: 10.4243
-      sd: 6.3012
-      a: 4.9906
-      b: 9.9969
+
   
   - name: "AIR_QAM02"
-    latitude: '43.490056'
-    longitude: '5.486556'
-    modele_pm2.5:
-      mean: 0
-      sd: 0
-      a: 0
-      b: 0
-    modele_pm10:
-      mean: 0
-      sd: 0
-      a: 0
-      b: 0
+    latitude: 43.490056
+    longitude: 5.486556
+
   
   - name: "AIR_QAM03"
-    latitude: 43.438333
-    longitude: 5.457028
-    modele_pm2.5:
-      mean: 0
-      sd: 0
-      a: 0
-      b: 0
-    modele_pm10:
-      mean: 0
-      sd: 0
-      a: 0
-      b: 0
+    latitude: 43.451750
+    longitude: 5.496389
+
   
   - name: "AIR_QAM04"
-    latitude: '43.45175'
-    longitude: '5.496389'
-    modele_pm2.5:
-      mean: 0
-      sd: 0
-      a: 0
-      b: 0
-    modele_pm10:
-      mean: 0
-      sd: 0
-      a: 0
-      b: 0
-  
-  - name: "AIR_QAM05"
     latitude: 43.445361
     longitude: 5.480111
-    modele_pm2.5:
-      mean: 578.1084
-      sd: 277.4236
-      a: -1.468
-      b: 7.02
-    modele_pm10:
-      mean: 603.9835
-      sd: 299.8889
-      a: -1.6189
-      b: 11.0332
+
+  
+  - name: "AIR_QAM05"
+    latitude: 43.438333
+    longitude: 5.457028
+
