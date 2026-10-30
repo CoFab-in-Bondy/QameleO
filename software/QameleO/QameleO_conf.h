@@ -1,116 +1,151 @@
 #ifndef QAMELEO_CONF_H
 #define QAMELEO_CONF_H
 
+// ============================================================================
+// Identification du capteur
+// ============================================================================
 
-// 1 - DEFINE THE NAME OF THE QameleO ACCORDING to the DATABASE
-#define VALUE_TO_STRING(x) #x
-#define VALUE(x) VALUE_TO_STRING(x)
-#define VAR_NAME_VALUE(var) #var "="  VALUE(var)
-
-
-//#define SENSOR_NAME "zaidoaiuzbfdubzaod"
 #ifndef SENSOR_NAME
-    #error You must define a SENSOR_NAME
+  #define SENSOR_NAME "QameleO_2026_"
 #endif
 
-// 2 - DEFINE QameleO INTERNAL COMPONENTS
+// ============================================================================
+// Choix des capteurs
+// Active UN SEUL capteur particules et UN SEUL capteur temperature/humidite.
+// ============================================================================
 
-// Configuration
-//#define DHT_SENSOR
-//#define SHT_SENSOR
+// Temperature / humidite
+#define SHT_SENSOR
+// #define DHT_SENSOR
 
-//#define NextPM_SENSOR
-//#define PMS7003_SENSOR
+// Particules
+#define NextPM_SENSOR
+// #define PMS7003_SENSOR
 
-// Default values
-#ifndef DHT_SENSOR
-    #ifndef SHT_SENSOR
-        #define SHT_SENSOR
-    #endif
-#endif
-#ifndef PMS7003_SENSOR
-    #ifndef NextPM_SENSOR
-        #define NextPM_SENSOR
-    #endif
+#if defined(SHT_SENSOR) && defined(DHT_SENSOR)
+  #error "Choisis un seul capteur temperature/humidite : SHT_SENSOR OU DHT_SENSOR"
 #endif
 
-// Check duplicate
-#ifdef DHT_SENSOR
-    #ifdef SHT_SENSOR
-        #error Must specify only one of NextPM_SENSOR and PMS7003_SENSOR
-    #endif
-#endif
-#ifdef NextPM_SENSOR
-    #ifdef PMS7003_SENSOR
-        #error Must specify only one of NextPM_SENSOR and PMS7003_SENSOR
-    #endif
+#if defined(NextPM_SENSOR) && defined(PMS7003_SENSOR)
+  #error "Choisis un seul capteur particules : NextPM_SENSOR OU PMS7003_SENSOR"
 #endif
 
-#define CONFIG_MEGA
+// ============================================================================
+// Fichiers SD
+// ============================================================================
 
-
-// 3 - DEFINE log system
-
-// Contient les données envoyées en GSM
-#ifndef FILE_NAME_LOG
-    #define FILE_NAME_LOG "datalog.csv"
-#endif
-
-// Contient les données qui n'ont pas encore été envoyé en GSM
 #ifndef FILE_NAME_BUFFER
-    #define FILE_NAME_BUFFER "notsend.csv"
+  #define FILE_NAME_BUFFER "notsend.csv"
 #endif
 
-// Contient les temps effectués par le programme en cas de reboot
 #ifndef FILE_NAME_SAVE
-    #define FILE_NAME_SAVE "timesave.csv"
+  #define FILE_NAME_SAVE "timesave.csv"
 #endif
 
+#ifndef FILE_NAME_LOG
+  #define FILE_NAME_LOG "datalog.csv"
+#endif
 
-// 4 - DEFINE GSM Connection
+// ============================================================================
+// Plateforme
+// ============================================================================
 
-// Set Sim card pin code
-#ifndef GSM_PIN_CODE
-    #define GSM_PIN_CODE "0000"
+#ifndef CONFIG_MEGA
+  #define CONFIG_MEGA
 #endif
-#ifndef GSM_APN
-    #define GSM_APN "orange"
-#endif
-#ifndef GSM_USER
-    #define GSM_USER ""
-#endif
-#ifndef GSM_PASS
-    #define GSM_PASS ""
-#endif
-#ifndef GSM_MQTT_BROKER
-    #define GSM_MQTT_BROKER ""
-#endif
+
+// ============================================================================
+// Timers en minutes
+// ============================================================================
 
 #ifndef MEASURE_PERIOD
-    #define MEASURE_PERIOD 1            // Time in minutes  default = 15
+  #define MEASURE_PERIOD 1UL  //15UL
 #endif
+
 #ifndef SEND_PERIOD
-    #define SEND_PERIOD 4               // Time in minutes  default = 60
+  #define SEND_PERIOD 5UL //60UL
 #endif
+
 #ifndef RECEIVE_UNIXTIME_PERIOD
-    #define RECEIVE_UNIXTIME_PERIOD 240 // Time in minutes  default = 240
+  #define RECEIVE_UNIXTIME_PERIOD 240 //240UL
 #endif
 
-// XXX - DEFINE REBOOT DELAY
+// ============================================================================
+// Watchdog / reboot
+// ============================================================================
+
 #ifndef REBOOT_DELAY
-    #define REBOOT_DELAY 5
+  #define REBOOT_DELAY 5UL
 #endif
 
+// ============================================================================
+// GSM / TEL0177
+// ============================================================================
 
-// Configuration for send message
-#ifndef SMS_TARGET
-  #define SMS_TARGET  "+33688334906" // "+33638231637"
+#ifndef GSM_PIN_CODE
+  #define GSM_PIN_CODE "0000"
 #endif
-#ifndef CALL_TARGET
-  #define CALL_TARGET "+33688334906" // "+33638231637"
+
+#ifndef GSM_APN
+  #define GSM_APN "mmsbouygtel.com"
 #endif
-#ifndef NETWORK_REGISTER_TIMEOUT
-  #define NETWORK_REGISTER_TIMEOUT 60000L
+
+#ifndef GSM_USER
+  #define GSM_USER ""
+#endif
+
+#ifndef GSM_PASS
+  #define GSM_PASS ""
+#endif
+
+#ifndef GSM_PDP_TYPE
+  #define GSM_PDP_TYPE "IP"
+#endif
+
+// Ancien nom conserve si du vieux code l'utilise encore.
+// Dans ton nouveau code, utilise plutot MQTT_HOST.
+#ifndef GSM_MQTT_BROKER
+  #define GSM_MQTT_BROKER MQTT_HOST
+#endif
+
+// ============================================================================
+// MQTT
+// ============================================================================
+
+#ifndef MQTT_HOST
+  #define MQTT_HOST "XXXXXX"
+#endif
+
+#ifndef MQTT_PORT
+  #define MQTT_PORT 1935
+#endif
+
+#ifndef MQTT_CLIENT_ID
+  #define MQTT_CLIENT_ID SENSOR_NAME
+#endif
+
+#ifndef MQTT_USER
+  #define MQTT_USER "XXXXXXX"
+#endif
+
+#ifndef MQTT_PASS
+  #define MQTT_PASS "XXXXXXX"
+#endif
+
+#ifndef MQTT_TOPIC
+  #define MQTT_TOPIC "gamasenseit"
+#endif
+
+#ifndef MQTT_TOPIC_TIME
+  #define MQTT_TOPIC_TIME "myTimer"
+#endif
+
+#ifndef MQTT_QOS
+  #define MQTT_QOS 0
+#endif
+
+#ifndef MQTT_RETAIN
+  #define MQTT_RETAIN false
 #endif
 
 #endif // QAMELEO_CONF_H

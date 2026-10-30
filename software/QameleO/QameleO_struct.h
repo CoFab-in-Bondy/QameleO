@@ -10,6 +10,9 @@ struct QameleO_measure
     float pm1;
     float pm10;
     float pm25;
+    float pm1_ppm;
+    float pm10_ppm;
+    float pm25_ppm;
     float humidityNextPM;
     float temperatureNextPM;
   };

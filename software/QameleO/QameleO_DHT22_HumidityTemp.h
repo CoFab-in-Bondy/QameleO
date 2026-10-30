@@ -1,11 +1,11 @@
 #ifndef QAMELEO_DGT22_HUMIDITYTEMP_H
 #define QAMELEO_DGT22_HUMIDITYTEMP_H
 
-#include "HumidityTempSensor.h"
-#include "QameleO_hard_conf.h"
-
 #include <Arduino.h>
 #include <DHT.h>
+
+#include "HumidityTempSensor.h"
+#include "QameleO_hard_conf.h"
 
 class QameleO_DHT22_HumidityTemp : public HumidityTempSensor
 {

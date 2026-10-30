@@ -1,102 +1,67 @@
 #ifndef QAMELEO_GSM_H
 #define QAMELEO_GSM_H
 
-#include "QameleO_hard_conf.h"
-#include "QameleO_struct.h"
+#include <Arduino.h>
+#include <TEL0177.h>
 
-#include <PubSubClient.h>
-#include <TinyGsmClient.h>
-
-/**
- *  
- */
-void callback(char* topic, byte *payload, unsigned int length);
-
-class QameleO_GSM
-{
+class QameleO_GSM {
   private:
-    
-    TinyGsmClient *client;
-    TinyGsm *modem;
-    PubSubClient *mqtt;
+    TEL0177 _modem;
+    static QameleO_GSM* _instance;
 
-    /**
-     * Contians the number of times that data has been sent by the GSM system
-     */
-    unsigned long nbSendMeasure;
+    bool _has_new_unix_time = false;
+    unsigned long _last_unix_time = 0;
 
-    /**
-     * Contians the number of times that unix time has been receive by the GSM system
-     */
-    unsigned long nbUnixTimeReceive;
-    
+    unsigned long _nbSendMeasure = 0;
+    unsigned long _nbUnixTimeReceive = 0;
+
+    static void _mqttCallbackRouter(const char* topic, const char* payload, uint16_t length);
+    static void _mqttRawCallbackRouter(const char* urc);
+
+    void _onMqttMessage(const char* topic, const char* payload, uint16_t length);
+    void _onMqttRaw(const char* urc);
+    bool _extractUnixTime(const char* payload);
+
+    bool _setupNetwork();
+    bool _setupMQTT();
+    bool _subscribeClockTopic();
+
   public:
-    /**
-     * Maker of the class
-     */
     QameleO_GSM();
 
-    /**
-     * Adds plus one to nbSendMeasure
-     */
-    void addOneSendMeasure();
+    bool begin();
 
-    /**
-     * Adds plus one to nbUnixTimeReceive
-     */
-    void addOneReceiveTime();
-    
-    /**
-     *  Close the connection
-     */
+    bool setupGSM_start();
+    bool setupMQTTAndSubscribe();
+    bool stopGSM();
+    bool reset();
     void closeGSM();
+    void loop();
+    void loopFor(uint32_t durationMs);
 
-    /**
-     * Return the number of SendMeasure
-     */
-    unsigned long getNbOfSendMeasure();
+    bool sendData(const String& msg, bool is_last = false);
+    bool sendData(const char* msg, bool is_last = false);
 
-    /**
-     * Return the number of unix time have been receive
-     */
-    unsigned long getNbOfUnixTimeReceive();
+    bool readTheClock(uint32_t listenMs = 5000);
+    bool reconnectMQTT();
+    bool resubscribeTopics();
 
-    /**
-     * Connect to the server on topic myTimer, and read the clock to know what time is it
-     * 
-     * @return true - if the program has been subscribe to the server
-     * @return false - if the program meet a problem to subscribe to the server
-     */
-    bool readTheClock();
-    
-    /**
-     * Send the message create
-     * 
-     * @param msg - The message to send
-     * @return true if it's a sucess, false if there are a problem
-     */
-    bool sendData(String msg);
+    void addOneSendMeasure();
+    void addOneReceiveTime();
 
-    /**
-     * Try the connection and if is a success, start it
-     */
-    bool setupGSM();
+    unsigned long getNbOfSendMeasure() const;
+    unsigned long getNbOfUnixTimeReceive() const;
+    unsigned long getLastUnixTime() const;
 
-    /**
-     * Setup the pin of the GSM system
-     */
-    void setupGSM_start();
+    bool hasNewUnixTime() const;
+    void clearNewUnixTimeFlag();
 
-    /**
-     * 
-     */
-    void startupGSM();
+    bool connectGSMAndMQTT();
 
-    /**
-     * 
-     */
-    void stopGSM();
-    
+    bool stopMQTTOnly();
+
+    //TEL_Status lastError() const;
+    //const char* lastResponse() const;
 };
 
-#endif //QAMELEO_GSM_H
+#endif // QAMELEO_GSM_H

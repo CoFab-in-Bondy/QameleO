@@ -11,14 +11,17 @@ QameleO_Boot_System syst;
 void processRebootWatchdog()
 {
     syst.addOne();
-    Serial.println("watchdog courant got up\n");
+    Serial.print("watchdog courant got up ");
+    Serial.print(syst.getTheCurrentWatchdog());
+    Serial.print(" -> ");
+    Serial.print(syst.getWatchdogMax());
     if ((syst.getTheCurrentWatchdog() ) >= syst.getWatchdogMax())
     {
       Serial.println("reboot via watchdog");
       syst.saveTimeSpent();
       MsTimer2::stop();
       wdt_enable(WDTO_500MS);
-      delay(500);
+      delay(5000);
    }
 }
 

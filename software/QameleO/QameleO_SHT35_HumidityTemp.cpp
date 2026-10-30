@@ -1,55 +1,44 @@
 #include "QameleO_SHT35_HumidityTemp.h"
 
-#include "HumidityTempSensor.h"
-#include "QameleO_hard_conf.h"
-
 #include <Arduino.h>
-#include "Seeed_SHT35.h"
 
-/**
- * Maker of the class
- */
-QameleO_SHT35_HumidityTemp::QameleO_SHT35_HumidityTemp():HumidityTempSensor()
-{
-  this->sensor = new  SHT35(SCLPIN);
+#include "QameleO_hard_conf.h"
+#include "QameleO_print.h"
+
+
+QameleO_SHT35_HumidityTemp::QameleO_SHT35_HumidityTemp() {
+  this->_sensor = new Adafruit_SHT31(Adafruit_SHT31());
 }
 
-/**
- * Collect the sensor's data
- */
-void QameleO_SHT35_HumidityTemp::runProcess()
-{
-  Serial.print("Humidity is mesuring ...  ");
-  float temp,hum;
-  if(NO_ERROR!=this->sensor->read_meas_data_single_shot(HIGH_REP_WITH_STRCH,&temp,&hum))
-  {
-    Serial.print(") (humidity: ");
-    Serial.println("NAN) -- FAILED!");
-  }else {
-    this->humidity = hum;
-    Serial.print(") (humidity: ");
-    Serial.print(this->humidity);
-    Serial.println(") -- OK!");
+void QameleO_SHT35_HumidityTemp::runProcess() {
+  //LOGLN("SHT35 is mesuring --->  ");
 
-    this->temperature = temp;
-    Serial.print(") (temperature: ");
-    Serial.print(this->temperature);
-    Serial.println(") -- OK!");
+  float temperature, humidity;
+
+  temperature = this->_sensor->readTemperature();
+  humidity    = this->_sensor->readHumidity();
+
+  if(!isnan(temperature) && !isnan(humidity)){
+    this->temperature = temperature;
+    this->humidity    = humidity;
+    
+    LOG("Humidity: ");
+    LOG(this->humidity);
+    LOGLN(" -- OK");
+
+    LOG("Temperature: ");
+    LOG(this->temperature);
+    LOGLN(" -- OK");
+  }else{
+    LOGLN(" SHT 35 : Temperature and Humidity is NAN -- FAILED !");
   }
-  //pms.readTempHumi(temperature, humidity);
 }
 
-/**
- * Setup the sensor
- */
-void QameleO_SHT35_HumidityTemp::setupSensor()
-{
-  // pinMode(HUMIDITY_TEMP_SWITCH_PIN,OUTPUT);
-  digitalWrite(HUMIDITY_TEMP_SWITCH_PIN,LOW);
-  Serial.print("setup Humidity sensor... ");
-  if(this->sensor->init()){
-    Serial.println(" -- FAILED!!!");
-  }else {
-    Serial.println(" -- OK!");
+void QameleO_SHT35_HumidityTemp::setupSensor() {
+  LOG("Setup SHT 35 _sensor ---> ");
+  if(!this->_sensor->begin(ADRESS_I2C_SHT35)){
+    LOGLN(" FAILLED !!! ");
+  }else{
+    LOGLN("  OK ");
   }
 }

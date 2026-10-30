@@ -8,40 +8,41 @@
 #include <Arduino.h>
 #include "NextPM.h"
 
-class QameleO_NextPM_Dust : public DustSensor
-{
-  private :
-
-    /**
-     *
-     */
+class QameleO_NextPM_Dust : public DustSensor {
+  private:
     NextPM *pms;
+
+    float p1_ppm;
+    float p10_ppm;
+    float p25_ppm;
 
     float temperature;
     float humidity;
 
-  public :
-    /**
-     * Maker of the class
-     */
+  public:
     QameleO_NextPM_Dust();
 
-    /**
-     * Close the sensor
-     */
+    float getP1_ppm();
+    
+    float getP10_ppm();
+    
+    float getP25_ppm();
+
+    float getHumidity();
+
+    float getTemperature();
+
     void closeDustSensor();
 
-    /**
-     * Collect the sensor's data
-     */
     void runDustSensorData();
 
-    void runDustSensorData(QameleO_measure &measure);
+    void runDustSensorData(QameleO_measure &);
 
-    /**
-     * Setup the sensor
-     */
     void setupDustSensor();
+
+    void wakeUp();
+
+    void sleep();
 };
 
-#endif //QAMELEO_NEXTPM_DUST_H
+#endif // QAMELEO_NEXTPM_DUST_H

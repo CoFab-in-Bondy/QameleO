@@ -1,8 +1,15 @@
 #ifndef QAMELEO_SD_H
 #define QAMELEO_SD_H
 
+#ifdef ESP32
+  #include <SPI.h>
+#endif
+
 #include <SD.h>
-#include "MyFile.h"
+#include <MyFile.h>
+
+#include "QameleO_print.h"
+#include "QameleO_conf.h"
 
 class QameleO_SD
 {

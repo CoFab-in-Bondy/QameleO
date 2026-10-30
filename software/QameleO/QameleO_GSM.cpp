@@ -1,353 +1,277 @@
 #include "QameleO_GSM.h"
 
-#include "DataMessage.h"
+#include "QameleO_conf.h"
+#include "QameleO_print.h"
 #include "QameleO_hard_conf.h"
-#include "QameleO_struct.h"
 
-#include <Arduino.h>
-#include <PubSubClient.h>
-#include <TinyGsmClient.h>
-#include "RTClib.h"
+QameleO_GSM * QameleO_GSM::_instance = nullptr;
 
-/**
- * When a message is received, this method transmits the message to DataMessage class
- */
-void callback(char* topic, byte *payload, unsigned int length) {
-  //Pour l'instant elle ne fait rien à par afficher sur la console
-  //Serial.println("-------Nouveau message du broker mqtt-----");
-  //Serial.print("Canal:");
-  //Serial.println(topic);
-  Serial.println();
-  Serial.print("donnee:");
-  Serial.write(payload, length);
-  DataMessage::setUnixTime(payload);
- }
-
-/**
- * Maker of the class
- */
 QameleO_GSM::QameleO_GSM()
-{
-  this->modem = new TinyGsm(SerialAT);
-  this->client = new TinyGsmClient(*this->modem);
-  this->mqtt = new PubSubClient(*this->client);
+  : _has_new_unix_time(false)
+  , _last_unix_time(0)
+  , _nbSendMeasure(0)
+  , _nbUnixTimeReceive(0)
+{}
 
-  this->nbSendMeasure=1;
-  this->nbUnixTimeReceive=0;
-}
+bool QameleO_GSM::begin() {
+  this->_instance = this;
 
-void QameleO_GSM::addOneSendMeasure()
-{
-  this->nbSendMeasure++;
-}
-
-void QameleO_GSM::addOneReceiveTime()
-{
-  this->nbUnixTimeReceive++;
-}
-
-/**
- * Close the connection
- */
-void QameleO_GSM::closeGSM()
-{
-  SerialAT.end();
-}
-
-/**
- * Return the number of SendMeasure
- */
-unsigned long QameleO_GSM::getNbOfSendMeasure()
-{
-  return this->nbSendMeasure;
-}
-
-unsigned long QameleO_GSM::getNbOfUnixTimeReceive()
-{
-  return this->nbUnixTimeReceive;
-}
-
-/**
- * Connect to the server on topic myTimer and subscribe on it. When a message has been received, callback() is called
- */
-bool QameleO_GSM::readTheClock()
-{
-  int retry = 3;
-  while (!this->modem->restart()) {
-   if(retry < 0){
-    Serial.println(" void QameleO_GSM::readTheClock(), modem->restart() : fail");
-    return false;
-   }else {
-     Serial.print(" retry ");
-     delay(10000);
-   }
-    retry = retry - 1;
-  }
-  Serial.print("(modem initialized) " );
-  // Unlock your SIM card with a PIN
-  this->modem->simUnlock(GSM_PIN_CODE);
-
-  retry = 3;
-  while (!this->modem->waitForNetwork(NETWORK_REGISTER_TIMEOUT)) {
-   if(retry < 0){
-    Serial.println(" void QameleO_GSM::readTheClock(), modem->waitForNetwork(NETWORK_REGISTER_TIMEOUT) : fail");
-    return false;
-   }else {
-    Serial.print(" retry ");
-   }
-    retry = retry - 1;
-  }
-
-  retry = 3;
-  while(!this->modem->gprsConnect(GSM_APN, "wap", "wapwap")) {
-   if(retry < 0){
-    Serial.println(" void QameleO_GSM::readTheClock(), modem->gprsConnect(GSM_APN, \"wap\", \"wapwap\") : fail");
-    return false;
-   }else{
-    Serial.print(" retry ");
-   }
-    retry = retry - 1;
-  }
-  Serial.print("(connected to network) " );
-
-  this->mqtt->setServer(GSM_MQTT_BROKER, 1935);
-  this->mqtt->setCallback(callback);
-
-  Serial.print("Connecting to ");
-  Serial.print(GSM_MQTT_BROKER);
-  retry = 3;
-  while (0 == this->mqtt->connect(SENSOR_NAME, "gamasenseit", "gamasenseit")) {
-    Serial.print(mqtt->state());
-    if(retry < 0){
-      Serial.println(" void QameleO_GSM::readTheClock(), mqtt->connect(SENSOR_NAME, \"gamasenseit\", \"gamasenseit\") : fail");
-      return false;
+  for (uint8_t i = 0; i < 3; i++) {
+    if (this->_modem.begin(SerialGSM)) {
+      return true;
     }
-    Serial.print(" retry ");
-    retry = retry - 1;
-  }
-
-  this->mqtt->subscribe("myTimer");
-
-  unsigned long timeBefore = millis();
-  while(this->mqtt->loop()){
-    unsigned long timeToWait = millis() - timeBefore;
-    if (timeToWait >= 10000){  //Disconnect after 10 sec in the loop
-      this->mqtt->disconnect();
-    }
-  }
-  return true;
-
-}
-
-/**
- * Send the message create
- *
- * @param msg - The message to send
- * @return true if it's a sucess, false if there are a problem
- */
-bool QameleO_GSM::sendData(String msg)
-{
-  //setupGSM();
-  // Restart takes quite some time
-  // To skip it, call init() instead of restart()
-  Serial.print("data is sending... " );
-  int retry = 3;
-  while (!this->modem->restart()) {
-   if(retry < 0)
-   {
-    Serial.println(" bool QameleO_GSM::sendData(String msg), modem->restart() : fail");
-    return false;
-   }
-    else
-    {
-          Serial.print(" retry ");
-          delay(10000);
-    }
-    retry = retry - 1;
-  }
-  Serial.print("(modem initialized) " );
-  // Unlock your SIM card with a PIN
-  this->modem->simUnlock(GSM_PIN_CODE);
-
-   retry = 3;
-  while (!this->modem->waitForNetwork(NETWORK_REGISTER_TIMEOUT)) {
-   if(retry < 0)
-   {
-    Serial.println(" bool QameleO_GSM::sendData(String msg), modem->waitForNetwork(NETWORK_REGISTER_TIMEOUT) : fail");
-    return false;
-   }
-    else
-    {
-          Serial.print(" retry ");
-    }
-    retry = retry - 1;
-  }
-  //String gsmTime = modem.getGSMDateTime(DATE_TIME);
-  retry = 3;
-  while(!this->modem->gprsConnect(GSM_APN, "wap", "wapwap")) {
-   if(retry < 0)
-   {
-    Serial.println(" bool QameleO_GSM::sendData(String msg), modem->gprsConnect(GSM_APN, \"wap\", \"wapwap\") : fail");
-    return false;
-   }
-    else
-    {
-          Serial.print(" retry ");
-    }
-    retry = retry - 1;
-  }
-  Serial.print("(connected to network) " );
-  this->mqtt->setServer(GSM_MQTT_BROKER, 1935);
-  Serial.print("Connecting to ");
-  Serial.print(GSM_MQTT_BROKER);
-  retry = 3;
-  while (0 == this->mqtt->connect(SENSOR_NAME, "gamasenseit", "gamasenseit")) {
-    Serial.print(mqtt->state());
-    if(retry < 0)
-    {
-      Serial.println(" bool QameleO_GSM::sendData(String msg), mqtt->connect(SENSOR_NAME, \"gamasenseit\", \"gamasenseit\") : fail");
-      return false;
-    }
-    else
-    {
-      Serial.print(" retry ");
-    }
-
-    retry = retry - 1;
-  }
-  Serial.println(" OK");
-
-  if(msg.length() <= 0)
-  {
-      Serial.println(" Le message est ne contient pas de caratère, il n'y a rien à envoyer");
-      return false;
-  }
-  unsigned int bufSize = msg.length() + 1;
-  char cmessage[bufSize];
-  msg.toCharArray(cmessage, bufSize);
-  Serial.print("to send ");
-  Serial.println(cmessage);
-  //char cmessage[50];
-  //msg.toCharArray(cmessage,50);
-  retry = 3;
-  bool notstop = true;
-  while (!this->mqtt->publish("gamasenseit", cmessage) && notstop)
-  {
-    if(retry < 0)
-    {
-      notstop = false;
-      Serial.println(" fail to send");
-    }
-    else{
-      Serial.print(" retry ");
-      retry = retry - 1;
-    }
-  }
-  if(retry >= 0)
-  {
-    Serial.println("sent OK");
-    this->mqtt->disconnect();
-    return true;
-  }
-  this->mqtt->disconnect();
-  return false;
-
-}
-
-/**
- * Try the connection and if is a success, start it
- */
-bool QameleO_GSM::setupGSM()
-{
-  Serial.print("Setup GSM...");
-  long rate = TRANSMISSION_RATE;
-  //long rate = 115200;
-  int retry = 3 ;
-  bool notConnected = true;
-  //Serial.println("rate = " + String(rate));
-  while(notConnected&&retry>0)
-  {
-    //Serial.println("Juste après c'est begin");
-    SerialAT.begin(rate);
-    //Serial.println("Juste avant c'était begin");
     delay(3000);
-    int nbloop = 20;
-    while (notConnected && nbloop > 0) {
-      SerialAT.print("AT\r\n");
-      //Serial.print("(wait) ");
-      String input = SerialAT.readString();
-      //Serial.println("Que dit input ? " + input);
-      if (input.indexOf("OK") >= 0) {
-        Serial.print(" (responded at rate ");
-        Serial.print(rate);
-        Serial.print(") ");
-        notConnected = false;
-      }
-       delay(1000);
-
-      nbloop = nbloop - 1;
-    }
-    Serial.println("");
-    Serial.println("retry");
-    retry = retry -1;
   }
-  delay(3000);
-  if(!notConnected)
-  {
-    Serial.println(" -- OK!");
+
+  return false;
+}
+
+unsigned long QameleO_GSM::getNbOfSendMeasure() const {
+  return this->_nbSendMeasure;
+}
+
+unsigned long QameleO_GSM::getNbOfUnixTimeReceive() const {
+  return this->_nbUnixTimeReceive;
+}
+
+unsigned long QameleO_GSM::getLastUnixTime() const {
+  return this->_last_unix_time;
+}
+
+bool QameleO_GSM::hasNewUnixTime() const {
+  return this->_has_new_unix_time;
+}
+
+void QameleO_GSM::clearNewUnixTimeFlag(){
+  this->_has_new_unix_time = false;
+}
+
+void QameleO_GSM::addOneSendMeasure() {
+  this->_nbSendMeasure++;
+}
+
+void QameleO_GSM::addOneReceiveTime() {
+  this->_nbUnixTimeReceive++;
+}
+
+void QameleO_GSM::_mqttCallbackRouter(const char * topic, const char * payload, uint16_t length){
+  if(_instance){
+    _instance->_onMqttMessage(topic, payload, length);
+  }
+}
+
+void QameleO_GSM::_mqttRawCallbackRouter(const char * urc){
+  if(_instance){
+    _instance->_onMqttRaw(urc);
+  }
+}
+
+void QameleO_GSM::_onMqttRaw(const char * urc) {
+  LOG("URC : ");
+  LOGLN(urc);
+  LOGLN("");
+}
+
+bool QameleO_GSM::_extractUnixTime(const char* payload) {
+  if (!payload || payload[0] == '\0') return false;
+
+  char* end = nullptr;
+  unsigned long ts = strtoul(payload, &end, 10);
+
+  if (end == payload) return false;
+  if (*end != '\0') return false;
+  if (ts == 0) return false;
+
+  this->_last_unix_time = ts;
+  return true;
+}
+
+void QameleO_GSM::_onMqttMessage(const char* topic, const char* payload, uint16_t length) {
+  if (!topic || !payload || length == 0) return;
+
+  if (strcmp(topic, MQTT_TOPIC_TIME) != 0) return;
+
+  char buffer[32];
+
+  if (length >= sizeof(buffer)) {
+    length = sizeof(buffer) - 1;
+  }
+
+  memcpy(buffer, payload, length);
+  buffer[length] = '\0';
+
+  if (this->_extractUnixTime(buffer)) {
+    this->_has_new_unix_time = true;
+    this->addOneReceiveTime();
+  }
+
+  LOG("Topic : ");
+  LOGLN(topic);
+  LOG("Length : ");
+  LOGLN(length);
+  LOG("Message : ");
+  LOGLN(buffer);
+  LOGLN("");
+}
+
+void QameleO_GSM::loop() {
+  this->_modem.loop();
+}
+
+void QameleO_GSM::loopFor(uint32_t durationMs) {
+  this->_modem.loopFor(durationMs);
+}
+
+bool QameleO_GSM::_setupNetwork() {
+  if (!this->_modem.isAlive()) return false;
+
+  this->_modem.simUnlock(GSM_PIN_CODE);
+  delay(1000);
+
+  if (!this->_modem.isSIMReady()) {
+    if (!this->_modem.simUnlock(GSM_PIN_CODE)) return false;
+  }
+
+  if (!this->_modem.isSIMReady()) return false;
+
+  if (!this->_modem.networkConnect(GSM_APN, GSM_USER, GSM_PASS, GSM_PDP_TYPE)) return false;
+
+  return true;
+}
+
+bool QameleO_GSM::setupGSM_start(){
+  return _setupNetwork();
+}
+
+bool QameleO_GSM::_setupMQTT(){
+  if(!this->_modem.mqttsetCallback(QameleO_GSM::_mqttCallbackRouter)) return false;
+  if(!this->_modem.mqttsetRawCallback(QameleO_GSM::_mqttRawCallbackRouter)) return false;
+
+  if(!this->_modem.mqttsetClient(MQTT_CLIENT_ID, MQTT_USER, MQTT_PASS)) return false;
+
+  if(!this->_modem.mqttconnect(MQTT_HOST, MQTT_PORT)) return false;
+
+  return true;
+}
+
+bool QameleO_GSM::_subscribeClockTopic(){
+  if(!this->_modem.mqttsubscribe(MQTT_TOPIC_TIME, MQTT_QOS)) return false;
+  
+  return true;
+}
+
+bool QameleO_GSM::setupMQTTAndSubscribe(){
+  if(!_setupMQTT()) return false;
+  if(!_subscribeClockTopic()) return false;
+
+  return true;
+}
+
+bool QameleO_GSM::readTheClock(uint32_t listenMs){
+  clearNewUnixTimeFlag();
+
+  unsigned long start = millis();
+  while (millis() - start < listenMs) {
+      loop();
+      if (hasNewUnixTime()) return true;
+  }
+  return false;
+}
+
+bool QameleO_GSM::sendData(const char* msg, bool is_last) {
+  if (!msg || msg[0] == '\0') {
+    return false;
+  }
+
+  LOG("sendData: publication MQTT...");
+  LOGLN(msg);
+
+  if (this->_modem.mqttpublish(MQTT_TOPIC, msg, MQTT_QOS, false)) {
+    LOGLN("sendData: publish OK");
     return true;
   }
-  else
-  {
-    Serial.println(" -- FAILED!");
-    delay(500);
+
+  LOGLN("sendData: publish echoue, tentative reconnexion MQTT...");
+
+  if (!this->reconnectMQTT()) {
+    LOGLN("sendData: reconnexion MQTT impossible");
     return false;
-
   }
+
+  bool ok = this->_modem.mqttpublish(MQTT_TOPIC, msg, MQTT_QOS, false);
+
+  LOGLN(ok ? "sendData: publish OK apres reconnexion" : "sendData: publish encore en erreur");
+
+  return ok;
 }
 
-/**
- * Setup the pin of the GSM system
- */
-void QameleO_GSM::setupGSM_start()
-{
-  pinMode(GSM_OFF, OUTPUT);
-  pinMode(GSM_LOWP, OUTPUT);
-  pinMode(GSM_ON, OUTPUT);
-  pinMode(GSM_RESET, OUTPUT);
-  digitalWrite(GSM_RESET, LOW);
-  digitalWrite(GSM_OFF, LOW);
-  digitalWrite(GSM_LOWP, HIGH);
-  digitalWrite(GSM_ON, LOW);
+
+bool QameleO_GSM::sendData(const String& msg, bool is_last){
+  return sendData(msg.c_str(), is_last);
 }
 
-/**
- *
- */
-void QameleO_GSM::startupGSM()
-{
-  digitalWrite(GSM_OFF, LOW);
-  digitalWrite(GSM_LOWP, LOW);
-  delay(1000);
-  digitalWrite(GSM_LOWP, HIGH);
-  digitalWrite(GSM_ON, HIGH);
-  delay(3000);
-  digitalWrite(GSM_ON, LOW);
-  delay(2000);
+
+bool QameleO_GSM::resubscribeTopics() {
+  return this->_subscribeClockTopic();
 }
 
-/**
- *
- */
-void QameleO_GSM::stopGSM()
-{
-  SerialAT.end();
-  digitalWrite(GSM_LOWP, HIGH);
-  digitalWrite(GSM_ON, LOW);
-  digitalWrite(GSM_OFF, HIGH);
-  digitalWrite(GSM_LOWP, LOW);
-  delay(1000);
-  digitalWrite(GSM_LOWP, HIGH);
+bool QameleO_GSM::reconnectMQTT() {
+  if (this->_modem.mqttisConnected()) {
+    return true;
+  }
 
-  digitalWrite(GSM_OFF, LOW);
+  if (!this->_modem.mqttreconnect()) {
+    return false;
+  }
+
+  return this->resubscribeTopics();
+}
+
+
+
+bool QameleO_GSM::stopGSM() {
+  bool mqttOk = this->_modem.mqttdisconnect();
+  bool netOk  = this->_modem.networkDisconnect();
+
+  return mqttOk && netOk;
+}
+
+bool QameleO_GSM::reset(){
+  return this->_modem.reset();
+}
+
+void QameleO_GSM::closeGSM() {
+  if (this->_modem.mqttisConnected()) {
+    this->_modem.mqttdisconnect();
+  }
+
+  this->_modem.networkDisconnect();
+
+  this->_has_new_unix_time = false;
+  this->_last_unix_time    = 0;
+  this->_nbSendMeasure     = 0;
+  this->_nbUnixTimeReceive = 0;
+}
+
+bool QameleO_GSM::connectGSMAndMQTT() {
+  if (!this->_setupNetwork()) {
+    return false;
+  }
+
+  if (!this->_setupMQTT()) {
+    this->_modem.networkDisconnect();
+    return false;
+  }
+
+  if (!this->_subscribeClockTopic()) {
+    this->_modem.mqttdisconnect();
+    this->_modem.networkDisconnect();
+    return false;
+  }
+
+  return true;
+}
+
+bool QameleO_GSM::stopMQTTOnly(){
+  return this->_modem.mqttdisconnect();
 }

@@ -5,8 +5,8 @@
 #include "QameleO_hard_conf.h"
 #include "MyPile.h"
 #include "MyPile.cpp"
-#include "MyFile.h"
-#include "MyFile.cpp"
+//#include "MyFile.h"
+//#include "MyFile.cpp"
 
 /**
  * Maker of the class
