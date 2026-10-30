@@ -31,7 +31,7 @@ DataMessage::DataMessage()
 }
 
 unsigned long DataMessage::unixTime = 0;
-uint32_t DataMessage::lastUpdateTimeClock = 0;
+
 /**
  * Add a time on the string
  *
@@ -53,6 +53,8 @@ String DataMessage::buildCaptureMessage(String data, int nbReboot)
   //uint32_t cdate = (millis() - lastUpdate ) / 1000 + startTime;
   //String sdate = String(cdate);
   String sdate = String(millis());
+
+
 
   String msg = sdate + ";";
   msg += String(nbReboot) + ";";
@@ -100,7 +102,7 @@ String DataMessage::haveNegativeClock(String msg, int nbRebootMax)
   String clockString="";
   String idRebootString="";
   byte check=0;
-  unsigned long clockLong;
+  long clockLong;
   char buf[msg.length()+1];
   msg.toCharArray(buf,msg.length()+1);
 
@@ -122,7 +124,6 @@ String DataMessage::haveNegativeClock(String msg, int nbRebootMax)
   Serial.println("toInt() w/ long : " + String(canard)); */
   QameleO_SD sd;
   clockLong = clockString.toInt() - sd.readBackup(idRebootString.toInt(), nbRebootMax);
-  
   /*Serial.println("Quasiment le tps utilisé " + String(millis()));
   Serial.println("Horloge négative : " + String(clockLong));*/
 
@@ -147,7 +148,7 @@ String DataMessage::haveUnixTime(String msg, int nbRebootMax)
   String clockString="";
   String idRebootString="";
   byte check=0;
-  unsigned long newTime;
+  long newTime;
   char buf[msg.length()+1];
   msg.toCharArray(buf,msg.length()+1);
 
@@ -164,21 +165,11 @@ String DataMessage::haveUnixTime(String msg, int nbRebootMax)
   }
 
   QameleO_SD sd;
-  newTime = clockString.toInt();// + sd.readBackup(idRebootString.toInt(), nbRebootMax);
-  newTime = (millis() - newTime)/1000;   //To have the time in second
-  if(unixTimeIsSet()){
-    Serial.println("Unix Time est set");
-    Serial.println(String(getUnixTime()));
-  }else{
-    Serial.println("Unix Time n'est pas set");
-  }
-  newTime = getUnixTime() - newTime;
+  newTime = clockString.toInt() + sd.readBackup(idRebootString.toInt(), nbRebootMax);
+  newTime = newTime/1000;   //To have the time in second
+  newTime += this->unixTime;
 
-  if(unixTimeIsSet()){
-    return String(newTime)+msg.substring(msg.indexOf(";",msg.indexOf(";")+1));
-  }else{
-    return String(-1)+msg.substring(msg.indexOf(";",msg.indexOf(";")+1));
-  }
+  return String(newTime)+msg.substring(msg.indexOf(";",msg.indexOf(";")+1));
 }
 
 /**
@@ -189,7 +180,6 @@ String DataMessage::haveUnixTime(String msg, int nbRebootMax)
 static void DataMessage::setUnixTime(unsigned long n)
 {
   unixTime = n;
-  lastUpdateTimeClock = millis();
   Serial.println(String(unixTime));
 }
 
@@ -200,10 +190,6 @@ bool DataMessage::unixTimeIsSet()
   }else {
     return false;
   }
-}
-
-static unsigned long DataMessage::getUnixTime(){
-  return unixTime + (millis() - lastUpdateTimeClock)/1000;
 }
 
 /**
