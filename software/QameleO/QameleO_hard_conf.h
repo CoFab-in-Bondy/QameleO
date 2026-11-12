@@ -15,4 +15,28 @@
   #define HUMIDITY_TEMP_SWITCH_PIN 7
 #endif
 
+
+// ============================================================================
+// Capteur particules PMS / NextPM
+// ============================================================================
+#ifndef SerialPMS
+  #define SerialPMS Serial1
+#endif
+
+#ifndef PMS_CONTROL_PIN
+  #define PMS_CONTROL_PIN 6
+#endif
+
+#ifndef PMS_ACQUIRE_DELAY
+  #define PMS_ACQUIRE_DELAY 60000
+#endif
+
+
+
+
+
+
+
+
+
 #endif // QAMELEO_HARD_CONF_H
