@@ -2,6 +2,13 @@
 #define QAMELEO_CONF_H
 
 // ============================================================================
+// Identification du capteur
+// ============================================================================
+#ifndef SENSOR_NAME
+  #define SENSOR_NAME "QameleO_2026_test"
+#endif
+
+// ============================================================================
 // Choix des capteurs
 // Active UN SEUL capteur particules et UN SEUL capteur temperature/humidite.
 // ============================================================================
@@ -19,6 +26,68 @@
 
 #if defined(NextPM_SENSOR) && defined(PMS7003_SENSOR)
   #error "Choisis un seul capteur particules : NextPM_SENSOR OU PMS7003_SENSOR"
+#endif
+
+// ============================================================================
+// GSM / TEL0177
+// ============================================================================
+#ifndef GSM_PIN_CODE
+  #define GSM_PIN_CODE "0000"
+#endif
+
+#ifndef GSM_APN
+  #define GSM_APN "mmsbouygtel.com"
+#endif
+
+#ifndef GSM_USER
+  #define GSM_USER ""
+#endif
+
+#ifndef GSM_PASS
+  #define GSM_PASS ""
+#endif
+
+#ifndef GSM_PDP_TYPE
+  #define GSM_PDP_TYPE "IP"
+#endif
+
+// ============================================================================
+// MQTT
+// ============================================================================
+#ifndef MQTT_HOST
+  #define MQTT_HOST "mqtt.qameleo.fr"
+#endif
+
+#ifndef MQTT_PORT
+  #define MQTT_PORT 1935
+#endif
+
+#ifndef MQTT_CLIENT_ID
+  #define MQTT_CLIENT_ID SENSOR_NAME
+#endif
+
+#ifndef MQTT_USER
+  #define MQTT_USER "gamasenseit"
+#endif
+
+#ifndef MQTT_PASS
+  #define MQTT_PASS "gamasenseit"
+#endif
+
+#ifndef MQTT_TOPIC
+  #define MQTT_TOPIC "gamasenseit/test"
+#endif
+
+#ifndef MQTT_TOPIC_TIME
+  #define MQTT_TOPIC_TIME "myTimer"
+#endif
+
+#ifndef MQTT_QOS
+  #define MQTT_QOS 0
+#endif
+
+#ifndef MQTT_RETAIN
+  #define MQTT_RETAIN false
 #endif
 
 #endif // QAMELEO_CONF_H
