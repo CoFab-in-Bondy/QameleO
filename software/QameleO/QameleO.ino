@@ -1,8 +1,9 @@
 #include <MemoryUsage.h>
 
+#include "QameleO_SD.h"
+#include "DataMessage.h"
 #include "QameleO_GSM_Tel.h"
 
-#include "DataMessage.h"
 
 #include "QameleO_conf.h"
 #include "QameleO_struct.h"
@@ -32,6 +33,7 @@ QameleO_GSM_Tel myGSM;
   HumidityTempSensor * myHumidityTempSensor = new QameleO_SHT35_HumidityTemp();
 #endif
 
+QameleO_SD mySD;
 DataMessage myDataMsg;
 QameleO_measure sensorData;
 
@@ -49,8 +51,10 @@ void setup() {
   Serial.println(F("-----------------------------> QameleO - Setup <---------------------------------"));
   Serial.println(F("Initialisation des modules ... "));
 
-  Serial.println(myGSM.begin() ? F("modem OK") : F("modem KO"));
+  Serial.println(myGSM.begin() ? F("Modem OK") : F("Modem KO"));
   myGSM.requestUnixTime();
+
+  Serial.println(mySD.begin() ? F("Carte SD OK") : F("Carte SD KO"));
   
   Serial.println();
   Serial.println(F("Initialisation des Capteurs ... "));
@@ -101,6 +105,10 @@ void loop() {
   Serial.println(F("-------------------------------------------------------------------------------------------------------"));
   Serial.print(F("Le message : "));
   Serial.println(dte);
+
+  Serial.print(F("Le SD : "));
+  mySD.saveDataInBufferFile(dte);
+
   Serial.println(F("-------------------------------------------------------------------------------------------------------"));
 
   reboot++;

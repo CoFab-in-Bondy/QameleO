@@ -90,4 +90,20 @@
   #define MQTT_RETAIN false
 #endif
 
+// ============================================================================
+// Fichiers SD
+// ============================================================================
+
+#ifndef FILE_NAME_BUFFER
+  #define FILE_NAME_BUFFER "notsend.csv"
+#endif
+
+#ifndef FILE_NAME_SAVE
+  #define FILE_NAME_SAVE "timesave.csv"
+#endif
+
+#ifndef FILE_NAME_LOG
+  #define FILE_NAME_LOG "datalog.csv"
+#endif
+
 #endif // QAMELEO_CONF_H
