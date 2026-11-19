@@ -4,6 +4,7 @@
 #include "QameleO_hard_conf.h"
 
 char QameleO_GSM_Tel::_unix_time [11] = "";
+unsigned long QameleO_GSM_Tel::_nbUnixTimeReceive = 0;
 
 QameleO_GSM_Tel::QameleO_GSM_Tel() {}
 
@@ -72,7 +73,13 @@ bool QameleO_GSM_Tel::sendData(const char * msg) {
     return false;
   }
 
-  return this->_modem.mqttpublish(MQTT_TOPIC, msg);
+  if(!this->_modem.mqttpublish(MQTT_TOPIC, msg)) {
+    return false;
+  }
+
+  addOneSendMeasure();
+
+  return true;
 }
 
 bool QameleO_GSM_Tel::_subscribeTimer() {
@@ -80,7 +87,7 @@ bool QameleO_GSM_Tel::_subscribeTimer() {
     return false;
   }
 
-  return this->_modem.mqttsubscribe(MQTT_PASS);
+  return this->_modem.mqttsubscribe(MQTT_TOPIC_TIME);
 }
 
 
@@ -97,18 +104,28 @@ void QameleO_GSM_Tel::_mqttCallbackRouter(const char* topic, const char* payload
 }
 
 bool QameleO_GSM_Tel::_saveUnixTime(const char * payload, uint16_t length) {
-  if(!length == 10) {
+  if(payload == nullptr || length != 10) {
     return false;
   }
 
   memcpy(_unix_time, payload, length);
   _unix_time[length] = '\0';
 
+  addOneReceiveTime();
+
   return true;
 }
 
 const char * QameleO_GSM_Tel::getUnixTime() const {
   return this->_unix_time; 
+}
+
+unsigned long QameleO_GSM_Tel::getNbUnixTimeReceive() const {
+  return this->_nbUnixTimeReceive; 
+}
+
+unsigned long QameleO_GSM_Tel::getNbSendMeasure() const {
+  return this->_nbSendMeasure;
 }
 
 
@@ -122,4 +139,13 @@ void QameleO_GSM_Tel::loop() {
 
 void QameleO_GSM_Tel::loopFor(int timer) {
   this->_modem.loopFor(timer);
+}
+
+
+void QameleO_GSM_Tel::addOneSendMeasure() {
+  this->_nbSendMeasure++;
+}
+
+void QameleO_GSM_Tel::addOneReceiveTime() {
+  _nbUnixTimeReceive++;
 }

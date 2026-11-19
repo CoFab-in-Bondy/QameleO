@@ -10,6 +10,11 @@ class QameleO_GSM_Tel
 
     static char _unix_time [11];
     bool _unix_time_received = false;
+    static unsigned long _nbUnixTimeReceive;
+
+    unsigned long _nbSendMeasure = 0;
+
+
 
     /**
      * 
@@ -50,9 +55,15 @@ class QameleO_GSM_Tel
      */
     bool sendData(const char * msg);
 
+    void addOneSendMeasure();
+    static void addOneReceiveTime();
+
 
     const char * getUnixTime() const;
 
+    unsigned long getNbSendMeasure() const;
+
+    unsigned long getNbUnixTimeReceive() const;
 
     bool requestUnixTime();
 
