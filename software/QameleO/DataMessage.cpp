@@ -54,7 +54,39 @@ const char * DataMessage::_buildCapteurMessage(const char * data, int nbReboot) 
   return this->_message;
 }
 
-
+/**
+ * @brief Construit un message contenant les mesures des capteurs.
+ *
+ * Format du message :
+ * temps;reboot;station;messageID;mesures
+ *
+ * Exemple :
+ * 107664;0;QameleO_2026_test;15;2.80:3.60:5.40:44.96:25.00:41.63:24.24:42.00:42.00:42.00
+ *
+ * Informations générales (séparées par ';') :
+ *  1. temps       : Temps écoulé depuis le démarrage (millis(), en ms)
+ *  2. reboot      : Nombre de redémarrages
+ *  3. station     : Identifiant de la station (SENSOR_NAME)
+ *  4. messageID   : Numéro du message
+ *
+ * Mesures (séparées par ':') :
+ *  1. pm1               : Concentration PM1 (µg/m3)
+ *  2. pm25              : Concentration PM2.5 (µg/m3)
+ *  3. pm10              : Concentration PM10 (µg/m3)
+ *  4. humidity          : Humidité SHT35 (%)
+ *  5. temperature       : Température SHT35 (°C)
+ *  6. humidityNextPM    : Humidité NextPM (%)
+ *  7. temperatureNextPM : Température NextPM (°C)
+ *  8. pm1_ppm           : Mesure PM1 supplémentaire (unité à vérifier)
+ *  9. pm25_ppm          : Mesure PM2.5 supplémentaire (unité à vérifier)
+ * 10. pm10_ppm          : Mesure PM10 supplémentaire (unité à vérifier)
+ *
+ * Les mesures présentes dépendent des capteurs activés.
+ *
+ * @param data     Structure contenant les mesures (QameleO_measure).
+ * @param nbReboot Nombre de redémarrages.
+ * @return Pointeur vers le message construit, stocké dans _message.
+ */
 const char * DataMessage::createMessage(QameleO_measure data, int nbReboot) {
   char chaine [150];
   chaine[0] = '\0';
