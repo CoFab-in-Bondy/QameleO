@@ -20,8 +20,6 @@ class DataMessage
 
     const char * _buildCapteurMessage(const char * data, int nbReboot);
 
-
-
   public :
 
     DataMessage();
