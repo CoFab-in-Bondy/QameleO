@@ -16,6 +16,10 @@ class QameleO_NextPM_Dust : public DustSensor
      */
     NextPM * pms;
 
+    float p1_ppm;
+    float p10_ppm;
+    float p25_ppm;
+
     float temperature;
     float humidity;
 
@@ -24,6 +28,16 @@ class QameleO_NextPM_Dust : public DustSensor
      * Maker of the class
      */
     QameleO_NextPM_Dust();
+
+    float getP1_ppm();
+    
+    float getP10_ppm();
+    
+    float getP25_ppm();
+
+    float getHumidity();
+
+    float getTemperature();
 
     /**
      * Close the sensor
@@ -41,6 +55,10 @@ class QameleO_NextPM_Dust : public DustSensor
      * Setup the sensor
      */
     void setupDustSensor();
+
+    void wakeUp();
+
+    void sleep();
 };
 
 #endif //QAMELEO_NEXTPM_DUST_H
