@@ -17,6 +17,8 @@ class QameleO_SD {
     bool saveDataInBufferFile(const char * msg);
 
     bool readNextMessage(char * buffer, size_t size);
+
+    bool confirmMessageSent();
 };
 
 #endif // QAMELEO_SD_H

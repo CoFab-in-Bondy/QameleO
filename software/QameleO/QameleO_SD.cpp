@@ -39,23 +39,35 @@ bool QameleO_SD::saveDataInBufferFile(const char * msg) {
   }
 }
 
+
 bool QameleO_SD::readNextMessage(char * buffer, size_t size) {
   if(buffer == nullptr || size == 0) {
     return false;
   }
 
+  buffer[0] = '\0';
+
   this->_myFile = SD.open(FILE_NAME_BUFFER, FILE_READ);
 
-  if (!this->_myFile.seek(_position)) {
+  if(!this->_myFile) {
     Serial.println("Erreur ouverture fichier BUFFER");
     return false;
   }
 
+  if (!this->_myFile.seek(this->_position)) {
+    Serial.println("Erreur position fichier BUFFER");
+    this->_myFile.close();
+    return false;
+  }
+
   size_t i = 0;
+  bool endOfLine = false;
 
   while(this->_myFile.available()) {
     char c = this->_myFile.read();
+
     if(c == '\n') {
+      endOfLine = true;
       break;
     }
 
@@ -66,6 +78,7 @@ bool QameleO_SD::readNextMessage(char * buffer, size_t size) {
     if (i >= size - 1) {
       Serial.println("Erreur : message trop long");
       this->_myFile.close();
+      buffer[0] = '\0';
       return false;
     }
 
@@ -73,4 +86,82 @@ bool QameleO_SD::readNextMessage(char * buffer, size_t size) {
     i++;
   }
   buffer[i] = '\0';
+
+  if(endOfLine) {
+    this->_nextPosition = this->_myFile.position();
+    this->_myFile.close();
+    return true;
+  }
+
+  Serial.println("Erreur : ligne incomplete");
+  this->_myFile.close();
+  buffer[0] = '\0';
+  return false;
 }
+
+bool QameleO_SD::confirmMessageSent() {
+  if(SD.exists(FILE_NAME_TEMP_POSITION)) {
+    if(!SD.remove(FILE_NAME_TEMP_POSITION)) {
+      return false;
+    }
+  }
+
+  this->_myFile = SD.open(FILE_NAME_TEMP_POSITION, FILE_WRITE);
+  if(!this->_myFile) {
+    Serial.print(F("Erreur d'ouverture du fichier de position : "));
+    Serial.println(FILE_NAME_TEMP_POSITION);
+    return false;
+  }
+
+  size_t nbt = this->_myFile.println(this->_nextPosition);
+  this->_myFile.close();
+  if(nbt == 0) {
+    return false;
+  }
+
+  if(SD.exists(FILE_NAME_POSITION)) {
+    if(!SD.remove(FILE_NAME_POSITION)) {
+      return false;
+    }
+  }
+  this->_myFile = SD.open(FILE_NAME_POSITION, FILE_WRITE);
+
+  if(!this->_myFile) {
+    Serial.print(F("Erreur d'ouverture du fichier de position : "));
+    Serial.println(FILE_NAME_POSITION);
+    return false;
+  }
+
+  Serial.println(F("Ecriture de la position ... "));
+  size_t nb = this->_myFile.println(this->_nextPosition);
+  this->_myFile.close();
+  Serial.println(F("terminer."));
+
+  if(nb == 0) {
+    Serial.println(F("Erreur ecriture de la position"));
+    return false;
+  }
+
+  this->_position = this->_nextPosition;
+  return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
