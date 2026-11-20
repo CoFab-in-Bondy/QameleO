@@ -106,4 +106,12 @@
   #define FILE_NAME_LOG "datalog.csv"
 #endif
 
+#ifndef FILE_NAME_POSITION 
+  #define FILE_NAME_POSITION  "pos.txt"
+#endif
+
+#ifndef FILE_NAME_TEMP_POSITION 
+  #define FILE_NAME_TEMP_POSITION  "temppos.txt"
+#endif
+
 #endif // QAMELEO_CONF_H

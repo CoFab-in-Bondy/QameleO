@@ -84,8 +84,7 @@ void loop() {
   Serial.println(F("Start sensor ..."));
 
   static int reboot = 0;
-
-
+  char buffer[256];
 
   #if defined(DHT_SENSOR) || defined(SHT_SENSOR)
     myHumidityTempSensor->runProcess();
@@ -108,6 +107,11 @@ void loop() {
 
   Serial.print(F("Le SD : "));
   mySD.saveDataInBufferFile(dte);
+
+  mySD.readNextMessage(buffer, sizeof(buffer));
+  Serial.print(F("Le buffer : "));
+  Serial.println(buffer);
+  mySD.confirmMessageSent();
 
   Serial.println(F("-------------------------------------------------------------------------------------------------------"));
 
