@@ -7,14 +7,20 @@ class QameleO_SD {
   private:
     File _myFile;
 
-    uint32_t _position = 0;
-    uint32_t _nextPosition  = 0;
+    uint32_t _position;
+    uint32_t _nextPosition;
+
+
+    bool _saveDataInBufferFile(const char * msg);
+
+    bool _saveDataInLogFile(const char * msg);
 
   public:
+    QameleO_SD();
 
     bool begin();
 
-    bool saveDataInBufferFile(const char * msg);
+    bool saveToSDBuffer(const char * msg);
 
     bool readNextMessage(char * buffer, size_t size);
 

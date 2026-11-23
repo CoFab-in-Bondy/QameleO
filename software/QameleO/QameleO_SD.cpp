@@ -3,6 +3,9 @@
 #include "QameleO_conf.h"
 #include "QameleO_hard_conf.h"
 
+
+QameleO_SD::QameleO_SD() : _position (0), _nextPosition(0) {}
+
 bool QameleO_SD::begin() {
   pinMode(SD_CONTROL_PIN, OUTPUT);
   
@@ -15,7 +18,7 @@ bool QameleO_SD::begin() {
   return true;
 }
 
-bool QameleO_SD::saveDataInBufferFile(const char * msg) {
+bool QameleO_SD::_saveDataInBufferFile(const char * msg) {
   if(msg == nullptr || msg[0] == '\0') {
     return false;
   }
@@ -35,6 +38,30 @@ bool QameleO_SD::saveDataInBufferFile(const char * msg) {
   } else {
     Serial.print("Erreur d'ouverture du fichier : ");
     Serial.println(FILE_NAME_BUFFER);
+    return false;
+  }
+}
+
+bool QameleO_SD::_saveDataInLogFile(const char * msg) {
+  if(msg == nullptr || msg[0] == '\0') {
+    return false;
+  }
+
+  this->_myFile = SD.open(FILE_NAME_LOG, FILE_WRITE);
+
+  if(this->_myFile) {
+    Serial.print("Ecriture dans le fichier ");
+    Serial.print(FILE_NAME_LOG);
+    Serial.print(" ... ");
+
+    this->_myFile.println(msg);
+    this->_myFile.close();
+
+    Serial.println("terminer.");
+    return true;
+  } else {
+    Serial.print("Erreur d'ouverture du fichier : ");
+    Serial.println(FILE_NAME_LOG);
     return false;
   }
 }
@@ -147,10 +174,14 @@ bool QameleO_SD::confirmMessageSent() {
 }
 
 
+bool QameleO_SD::saveToSDBuffer(const char* msg) {
+  retrun this->_saveDataInBufferFile(msg);
+}
 
 
-
-
+bool QameleO_SD::saveToSDLog(const char* msg) {
+  retrun this->_saveDataInLogFile(msg);
+}
 
 
 
