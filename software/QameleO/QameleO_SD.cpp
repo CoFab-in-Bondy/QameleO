@@ -18,6 +18,20 @@ bool QameleO_SD::begin() {
   return true;
 }
 
+
+bool QameleO_SD::resetSD() {
+
+  if(SD.exists(FILE_NAME_BUFFER)) {
+    SD.remove(FILE_NAME_BUFFER);
+  }
+
+  if(SD.exists(FILE_NAME_LOG)) {
+    SD.remove(FILE_NAME_LOG);
+  }
+
+  return true;
+}
+
 bool QameleO_SD::_saveDataInBufferFile(const char * msg) {
   if(msg == nullptr || msg[0] == '\0') {
     return false;
@@ -77,7 +91,7 @@ bool QameleO_SD::readNextMessage(char * buffer, size_t size) {
   this->_myFile = SD.open(FILE_NAME_BUFFER, FILE_READ);
 
   if(!this->_myFile) {
-    Serial.println("Erreur ouverture fichier BUFFER");
+    Serial.println("Erreur : ouverture fichier BUFFER");
     return false;
   }
 
@@ -175,19 +189,116 @@ bool QameleO_SD::confirmMessageSent() {
 
 
 bool QameleO_SD::saveToSDBuffer(const char* msg) {
-  retrun this->_saveDataInBufferFile(msg);
+  return this->_saveDataInBufferFile(msg);
 }
 
 
 bool QameleO_SD::saveToSDLog(const char* msg) {
-  retrun this->_saveDataInLogFile(msg);
+  return this->_saveDataInLogFile(msg);
 }
 
 
+bool QameleO_SD::hasPendingMessages() {
+  if(!SD.exists(FILE_NAME_BUFFER)) {
+    return false;
+  }
 
+  this->_myFile = SD.open(FILE_NAME_BUFFER, FILE_READ);
+  if(!this->_myFile) {
+    Serial.println("Erreur : ouverture fichier BUFFER");
+    return false;
+  }
 
+  uint32_t taille = this->_myFile.size();
+  this->_myFile.close();
 
+  if(taille > this->_position) {
+    //Serial.print("Taille du fichier : ");
+    //Serial.println(taille);
+    //Serial.print("Position confirmée : ");
+    //Serial.println(this->_position);
+    return true;
+  } 
+  else if (taille < this->_position) {
+    Serial.println("La position est superieur a la taille !!!");
+    return false;
+  } 
+  //else if (taille == this->_position) {
+    //Serial.println("La position est egale a la taille : tous les octets ont ete traites");
+    //return true;
+  //}
 
+    //Serial.println("Taille du fichier : ");
+    //Serial.print(taille);
+    //Serial.println("Position confirmée : ");
+    //Serial.print(this->_position);
+  return false;
+}
+
+// Limite de cas à compléter
+bool QameleO_SD::compactBuffer() {
+  if(!SD.exists(FILE_NAME_BUFFER)) {
+    Serial.println("Erreur : le fichier du buffer inexistant !!! ");
+    return false;
+  }
+
+  // pour l'instant suppression trop radicale : mieux stocker les données encore utile
+  if(SD.exists("temps.csv")) {
+    SD.remove("temps.csv"); 
+  }
+
+  this->_myFile = SD.open(FILE_NAME_BUFFER, FILE_READ);
+  File temp = SD.open("temps.csv", FILE_WRITE);
+
+  if(!this->_myFile || !temp) {
+    Serial.println("Erreur : ouverture fichier BUFFER ou temporaire");
+    this->_myFile.close();
+    temp.close();
+    return false;
+  }
+
+  if(!this->_myFile.seek(this->_position)) {
+    this->_myFile.close();
+    temp.close();
+    return false;
+    }
+
+  while(this->_myFile.available()) {
+    temp.write(this->_myFile.read());
+  }
+
+  this->_myFile.close();
+  temp.close();
+
+  SD.remove(FILE_NAME_BUFFER);
+
+  temp = SD.open("temps.csv", FILE_READ);
+  this->_myFile = SD.open(FILE_NAME_BUFFER, FILE_WRITE);
+
+  if(!this->_myFile || !temp) {
+    Serial.println("Erreur : ouverture fichier BUFFER ou temporaire");
+    this->_myFile.close();
+    temp.close();
+    return false;
+  }
+
+  while(temp.available()) {
+    this->_myFile.write(temp.read());
+  }
+
+  this->_myFile.close();
+  temp.close();
+  SD.remove("temps.csv");
+
+  if(SD.exists(FILE_NAME_POSITION)) {
+    SD.remove(FILE_NAME_POSITION); 
+  }
+
+  this->_position = 0;
+  this->_nextPosition = 0;
+
+  return true;
+}
 
 
 

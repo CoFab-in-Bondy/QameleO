@@ -20,11 +20,19 @@ class QameleO_SD {
 
     bool begin();
 
+    bool resetSD();
+
     bool saveToSDBuffer(const char * msg);
+
+    bool saveToSDLog(const char * msg);
 
     bool readNextMessage(char * buffer, size_t size);
 
     bool confirmMessageSent();
+
+    bool hasPendingMessages();
+
+    bool compactBuffer();
 };
 
 #endif // QAMELEO_SD_H
