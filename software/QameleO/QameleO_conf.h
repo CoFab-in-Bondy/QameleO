@@ -93,7 +93,6 @@
 // ============================================================================
 // Fichiers SD
 // ============================================================================
-
 #ifndef FILE_NAME_BUFFER
   #define FILE_NAME_BUFFER "notsend.csv"
 #endif
@@ -112,6 +111,13 @@
 
 #ifndef FILE_NAME_TEMP_POSITION 
   #define FILE_NAME_TEMP_POSITION  "temppos.txt"
+#endif
+
+// ============================================================================
+// Watchdog / reboot
+// ============================================================================
+#ifndef REBOOT_DELAY
+  #define REBOOT_DELAY 5UL
 #endif
 
 #endif // QAMELEO_CONF_H
