@@ -55,6 +55,7 @@ void setup() {
   myGSM.requestUnixTime();
 
   Serial.println(mySD.begin() ? F("Carte SD OK") : F("Carte SD KO"));
+  Serial.println(mySD.resetSD() ? F("Reset SD OK") : F("Reset SD KO"));
   
   Serial.println();
   Serial.println(F("Initialisation des Capteurs ... "));
@@ -84,7 +85,9 @@ void loop() {
   Serial.println(F("Start sensor ..."));
 
   static int reboot = 0;
-  char buffer[256];
+  char message[256];
+
+  static int test = 0;
 
   #if defined(DHT_SENSOR) || defined(SHT_SENSOR)
     myHumidityTempSensor->runProcess();
@@ -106,16 +109,22 @@ void loop() {
   Serial.println(dte);
 
   Serial.print(F("Le SD : "));
-  mySD.saveDataInBufferFile(dte);
+  mySD.saveToSDBuffer(dte);
 
-  mySD.readNextMessage(buffer, sizeof(buffer));
-  Serial.print(F("Le buffer : "));
-  Serial.println(buffer);
-  mySD.confirmMessageSent();
+  if(mySD.readNextMessage(message, sizeof(message))) {
+    // Envoie MQTT avec le GSM confirmer
+    if(test <= 5) {
+      mySD.confirmMessageSent();
+      mySD.saveToSDLog(message);
+      mySD.compactBuffer();
+    }
+  }
 
   Serial.println(F("-------------------------------------------------------------------------------------------------------"));
 
   reboot++;
+
+  test++; 
   delay(5000);
   Serial.println();
 }
