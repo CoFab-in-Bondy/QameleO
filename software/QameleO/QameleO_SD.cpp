@@ -3,9 +3,16 @@
 #include "QameleO_conf.h"
 #include "QameleO_hard_conf.h"
 
-
+/**
+ * @brief Construct a new QameleO_SD object
+ */
 QameleO_SD::QameleO_SD() : _position (0), _nextPosition(0) {}
 
+/**
+ * @brief Initialize the SD card
+ * 
+ * @return true if the SD card was successfully initialized, false otherwise
+ */
 bool QameleO_SD::begin() {
   pinMode(SD_CONTROL_PIN, OUTPUT);
   
@@ -18,7 +25,11 @@ bool QameleO_SD::begin() {
   return true;
 }
 
-
+/**
+ * @brief Reset the SD card
+ * 
+ * @return true if the SD card was successfully reset, false otherwise
+ */
 bool QameleO_SD::resetSD() {
 
   if(SD.exists(FILE_NAME_BUFFER)) {
@@ -32,6 +43,12 @@ bool QameleO_SD::resetSD() {
   return true;
 }
 
+/**
+ * @brief Save data in the buffer file
+ * 
+ * @param msg The message to save
+ * @return true if the message was successfully saved, false otherwise
+ */
 bool QameleO_SD::_saveDataInBufferFile(const char * msg) {
   if(msg == nullptr || msg[0] == '\0') {
     return false;
@@ -56,6 +73,12 @@ bool QameleO_SD::_saveDataInBufferFile(const char * msg) {
   }
 }
 
+/**
+ * @brief Save data in the log file
+ * 
+ * @param msg The message to save
+ * @return true if the message was successfully saved, false otherwise
+ */
 bool QameleO_SD::_saveDataInLogFile(const char * msg) {
   if(msg == nullptr || msg[0] == '\0') {
     return false;
@@ -80,7 +103,13 @@ bool QameleO_SD::_saveDataInLogFile(const char * msg) {
   }
 }
 
-
+/**
+ * @brief Read the next message from the SD buffer
+ * 
+ * @param buffer The buffer to store the message
+ * @param size The size of the buffer
+ * @return true if a message was successfully read, false otherwise
+ */
 bool QameleO_SD::readNextMessage(char * buffer, size_t size) {
   if(buffer == nullptr || size == 0) {
     return false;
@@ -140,6 +169,11 @@ bool QameleO_SD::readNextMessage(char * buffer, size_t size) {
   return false;
 }
 
+/**
+ * @brief Confirm that the last read message was sent
+ * 
+ * @return true if the message was successfully confirmed, false otherwise
+ */
 bool QameleO_SD::confirmMessageSent() {
   if(SD.exists(FILE_NAME_TEMP_POSITION)) {
     if(!SD.remove(FILE_NAME_TEMP_POSITION)) {
@@ -301,9 +335,193 @@ bool QameleO_SD::compactBuffer() {
 }
 
 
+int QameleO_SD::readNbReboot() {
+  if (SD.exists(FILE_NAME_SAVE)) {
+
+    this->_myFile = SD.open(FILE_NAME_SAVE, FILE_READ);
+
+    if (!this->_myFile) {
+      Serial.println(F("Error SD : Error opening FILE_NAME_SAVE"));
+      return 0;
+    }
+
+    int nbLine = 0;
+
+    while (this->_myFile.available()) {
+      int c = this->_myFile.read();
+      if (c == '\r') {
+        nbLine++;
+      }
+    }
+
+    this->_myFile.close();
+
+    Serial.print(F("Number of reboot read : "));
+    Serial.println(nbLine);
+    return nbLine;
+  } else {
+    Serial.println(F("There are not any reboot, return the default value"));
+    return 0;
+  }
+}
+
+
+void QameleO_SD::_saveMillisInFile() {
+  unsigned long currentMillis = millis();
+  const char * tempName = "MILLTMP.TXT";
+
+  if (SD.exists(tempName)) {
+    if (!SD.remove(tempName)) {
+      Serial.println(F("Erreur suppression fichier temporaire"));
+      return;
+    }
+  }
+
+  File temp = SD.open(tempName, FILE_WRITE);
+
+  if (!temp) {
+    Serial.println(F("Erreur ouverture fichier temporaire"));
+    return;
+  }
+
+  bool ok = temp.print(currentMillis) > 0;
+
+  if (temp.println(';') == 0) {
+    ok = false;
+  }
+
+  if (ok && SD.exists(FILE_NAME_SAVE)) {
+
+    File source = SD.open(FILE_NAME_SAVE, FILE_READ);
+
+    if (!source) {
+      Serial.println(F("Erreur ouverture fichier SAVE"));
+      ok = false;
+    } else {
+
+      while (source.available()) {
+
+        int c = source.read();
+
+        if (c < 0 || temp.write((uint8_t)c) != 1) {
+          Serial.println(F("Erreur copie vers temporaire"));
+          ok = false;
+          break;
+        }
+      }
+
+      source.close();
+    }
+  }
+
+  temp.close();
+
+  if (!ok) {
+    SD.remove(tempName);
+    return;
+  }
+
+  if (SD.exists(FILE_NAME_SAVE)) {
+    if (!SD.remove(FILE_NAME_SAVE)) {
+      Serial.println(F("Erreur suppression fichier SAVE"));
+      return;
+    }
+  }
+
+  File destination = SD.open(FILE_NAME_SAVE, FILE_WRITE);
+  File sourceTemp = SD.open(tempName, FILE_READ);
+
+  if (!destination || !sourceTemp) {
+    Serial.println(F("Erreur ouverture fichiers pour reconstruction"));
+    destination.close();
+    sourceTemp.close();
+    return;
+  }
+
+  ok = true;
+
+  while (sourceTemp.available()) {
+
+    int c = sourceTemp.read();
+
+    if (c < 0 || destination.write((uint8_t)c) != 1) {
+      Serial.println(F("Erreur reconstruction fichier SAVE"));
+      ok = false;
+      break;
+    }
+  }
+
+  destination.close();
+  sourceTemp.close();
+
+  if (!ok) {
+    return;
+  }
+
+  if (!SD.remove(tempName)) {
+    Serial.println(F("Attention : temporaire non supprime"));
+  }
+
+  Serial.println(F("Sauvegarde de millis terminee"));
+}
 
 
 
+long QameleO_SD::readBackup(int idReboot, int nbRebootMax) {
+  int a = nbRebootMax - idReboot;
+
+  uint32_t oldMillis = millis();
+
+  if (a <= 0) {
+    return (long)oldMillis;
+  }
+
+  if (!SD.exists(FILE_NAME_SAVE)) {
+    return (long)oldMillis;
+  }
+
+  this->_myFile = SD.open(FILE_NAME_SAVE, FILE_READ);
+
+  if (!this->_myFile) {
+    Serial.println(F("Erreur ouverture fichier SAVE"));
+    return (long)oldMillis;
+  }
+
+  uint32_t valeur = 0;
+  int check = 0;
+
+  bool nombreEnCours = false;
+
+  while (this->_myFile.available() && check < a) {
+
+    int c = this->_myFile.read();
+
+    if (c >= '0' && c <= '9') {
+
+      valeur = valeur * 10UL + (c - '0');
+      nombreEnCours = true;
+
+    } else if (c == ';') {
+
+      if (nombreEnCours) {
+
+        oldMillis += valeur;
+        check++;
+      }
+
+      valeur = 0;
+      nombreEnCours = false;
+
+    }
+  }
+
+  this->_myFile.close();
+
+  return (long)oldMillis;
+}
 
 
-
+void QameleO_SD::saveOnBackup(int n)
+{ 
+  this->_saveMillisInFile();
+}
