@@ -56,8 +56,6 @@ TEL_Status TEL0177_AT_Core::sendAndWait(const char* command, const char* expecte
                 this->_rxBuffer[idx]   = '\0';
             }
 
-            start = millis(); // On prolonge tant que ça répond
-
             if(_contains(this->_rxBuffer, expected)) {
                 return TEL_OK;
             }
@@ -170,6 +168,8 @@ if (!this->_serial || !expected || expected[0] == '\0') return false;
 
     memset(this->_rxBuffer, 0, sizeof(this->_rxBuffer));
 
+    // Délai absolu (ne se prolonge pas à chaque octet reçu), voir
+    // _waitForOKorERROR pour la justification.
     while (millis() - start < timeout) {
         if (this->_serial->available()) {
             char c = static_cast<char>(this->_serial->read());
@@ -178,8 +178,6 @@ if (!this->_serial || !expected || expected[0] == '\0') return false;
                 this->_rxBuffer[idx++] = c;
                 this->_rxBuffer[idx] = '\0';
             }
-
-            start = millis();
 
             if (this->_contains(this->_rxBuffer, expected)) {
                 return true;
@@ -201,10 +199,11 @@ bool TEL0177_AT_Core::readLine(char* buffer, uint16_t size, uint32_t timeout) {
     uint16_t idx = 0;
     uint32_t start = millis();
 
+    // Délai absolu (ne se prolonge pas à chaque octet reçu), voir
+    // _waitForOKorERROR pour la justification.
     while (millis() - start < timeout) {
         if (this->_serial->available()) {
             char c = static_cast<char>(this->_serial->read());
-            start = millis();
 
             if (c == '\r') continue;
 
@@ -321,6 +320,11 @@ TEL_Status TEL0177_AT_Core::_waitForOKorERROR(uint32_t timeout) {
 
     memset(this->_rxBuffer, 0, sizeof(this->_rxBuffer));
 
+    // Délai absolu : ne jamais prolonger l'attente même si des octets
+    // continuent d'arriver. Avant ce correctif, "start" était réinitialisé
+    // à chaque octet reçu, ce qui pouvait bloquer indéfiniment la boucle
+    // (et donc tout le sketch, ex. figé sur "Envoie MQTT : ") si le modem
+    // envoyait un flux continu ne contenant jamais "OK"/"ERROR".
     while (millis() - start < timeout) {
         if (this->_serial->available()) {
             char c = static_cast<char>(this->_serial->read());
@@ -329,8 +333,6 @@ TEL_Status TEL0177_AT_Core::_waitForOKorERROR(uint32_t timeout) {
                 this->_rxBuffer[idx++] = c;
                 this->_rxBuffer[idx] = '\0';
             }
-
-            start = millis();
 
             if (this->_contains(this->_rxBuffer, "\r\nOK\r\n") ||
                 this->_contains(this->_rxBuffer, "\nOK\r\n") ||
