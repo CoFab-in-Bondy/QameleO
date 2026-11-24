@@ -45,7 +45,17 @@
   #define SD_CONTROL_PIN 53
 #endif
 
+// ============================================================================
+// Ventilateur
+// ============================================================================
 
+#ifndef FAN_CONTROL_PIN
+  #define FAN_CONTROL_PIN 6
+#endif
+
+#ifndef FAN_DELAY
+  #define FAN_DELAY 120000UL
+#endif
 
 
 #endif // QAMELEO_HARD_CONF_H
