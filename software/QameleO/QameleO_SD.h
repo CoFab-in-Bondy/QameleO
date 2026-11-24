@@ -16,6 +16,7 @@ class QameleO_SD {
     bool _saveDataInLogFile(const char * msg);
 
   public:
+    
     QameleO_SD();
 
     bool begin();

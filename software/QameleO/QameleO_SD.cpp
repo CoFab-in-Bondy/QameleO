@@ -10,11 +10,11 @@ bool QameleO_SD::begin() {
   pinMode(SD_CONTROL_PIN, OUTPUT);
   
   if(!SD.begin(SD_CONTROL_PIN)) {
-    Serial.println("Erreur d'initialisation SD");
+    Serial.println(F("Erreur d'initialisation SD"));
     return false;
   }
 
-  //Serial.println("Carte SD initialisee");
+  //Serial.println(F("Carte SD initialisee"));
   return true;
 }
 
@@ -40,17 +40,17 @@ bool QameleO_SD::_saveDataInBufferFile(const char * msg) {
   this->_myFile = SD.open(FILE_NAME_BUFFER, FILE_WRITE);
 
   if(this->_myFile) {
-    Serial.print("Ecriture dans le fichier ");
+    Serial.print(F("Ecriture dans le fichier "));
     Serial.print(FILE_NAME_BUFFER);
-    Serial.print(" ... ");
+    Serial.print(F(" ... "));
 
     this->_myFile.println(msg);
     this->_myFile.close();
 
-    Serial.println("terminer.");
+    Serial.println(F("terminer."));
     return true;
   } else {
-    Serial.print("Erreur d'ouverture du fichier : ");
+    Serial.print(F("Erreur d'ouverture du fichier : "));
     Serial.println(FILE_NAME_BUFFER);
     return false;
   }
@@ -64,17 +64,17 @@ bool QameleO_SD::_saveDataInLogFile(const char * msg) {
   this->_myFile = SD.open(FILE_NAME_LOG, FILE_WRITE);
 
   if(this->_myFile) {
-    Serial.print("Ecriture dans le fichier ");
+    Serial.print(F("Ecriture dans le fichier "));
     Serial.print(FILE_NAME_LOG);
     Serial.print(" ... ");
 
     this->_myFile.println(msg);
     this->_myFile.close();
 
-    Serial.println("terminer.");
+    Serial.println(F("terminer."));
     return true;
   } else {
-    Serial.print("Erreur d'ouverture du fichier : ");
+    Serial.print(F("Erreur d'ouverture du fichier : "));
     Serial.println(FILE_NAME_LOG);
     return false;
   }
@@ -91,12 +91,12 @@ bool QameleO_SD::readNextMessage(char * buffer, size_t size) {
   this->_myFile = SD.open(FILE_NAME_BUFFER, FILE_READ);
 
   if(!this->_myFile) {
-    Serial.println("Erreur : ouverture fichier BUFFER");
+    Serial.println(F("Erreur : ouverture fichier BUFFER"));
     return false;
   }
 
   if (!this->_myFile.seek(this->_position)) {
-    Serial.println("Erreur position fichier BUFFER");
+    Serial.println(F("Erreur position fichier BUFFER"));
     this->_myFile.close();
     return false;
   }
@@ -117,7 +117,7 @@ bool QameleO_SD::readNextMessage(char * buffer, size_t size) {
     }
 
     if (i >= size - 1) {
-      Serial.println("Erreur : message trop long");
+      Serial.println(F("Erreur : message trop long"));
       this->_myFile.close();
       buffer[0] = '\0';
       return false;
@@ -134,7 +134,7 @@ bool QameleO_SD::readNextMessage(char * buffer, size_t size) {
     return true;
   }
 
-  Serial.println("Erreur : ligne incomplete");
+  Serial.println(F("Erreur : ligne incomplete"));
   this->_myFile.close();
   buffer[0] = '\0';
   return false;
@@ -205,7 +205,7 @@ bool QameleO_SD::hasPendingMessages() {
 
   this->_myFile = SD.open(FILE_NAME_BUFFER, FILE_READ);
   if(!this->_myFile) {
-    Serial.println("Erreur : ouverture fichier BUFFER");
+    Serial.println(F("Erreur : ouverture fichier BUFFER"));
     return false;
   }
 
@@ -213,24 +213,24 @@ bool QameleO_SD::hasPendingMessages() {
   this->_myFile.close();
 
   if(taille > this->_position) {
-    //Serial.print("Taille du fichier : ");
+    //Serial.print(F("Taille du fichier : "));
     //Serial.println(taille);
-    //Serial.print("Position confirmée : ");
+    //Serial.print(F("Position confirmée : "));
     //Serial.println(this->_position);
     return true;
   } 
   else if (taille < this->_position) {
-    Serial.println("La position est superieur a la taille !!!");
+    Serial.println(F("La position est superieur a la taille !!!"));
     return false;
   } 
   //else if (taille == this->_position) {
-    //Serial.println("La position est egale a la taille : tous les octets ont ete traites");
+    //Serial.println(F("La position est egale a la taille : tous les octets ont ete traites"));
     //return true;
   //}
 
-    //Serial.println("Taille du fichier : ");
+    //Serial.println(F("Taille du fichier : "));
     //Serial.print(taille);
-    //Serial.println("Position confirmée : ");
+    //Serial.println(F("Position confirmée : "));
     //Serial.print(this->_position);
   return false;
 }
@@ -238,7 +238,7 @@ bool QameleO_SD::hasPendingMessages() {
 // Limite de cas à compléter
 bool QameleO_SD::compactBuffer() {
   if(!SD.exists(FILE_NAME_BUFFER)) {
-    Serial.println("Erreur : le fichier du buffer inexistant !!! ");
+    Serial.println(F("Erreur : le fichier du buffer inexistant !!! "));
     return false;
   }
 
@@ -251,7 +251,7 @@ bool QameleO_SD::compactBuffer() {
   File temp = SD.open("temps.csv", FILE_WRITE);
 
   if(!this->_myFile || !temp) {
-    Serial.println("Erreur : ouverture fichier BUFFER ou temporaire");
+    Serial.println(F("Erreur : ouverture fichier BUFFER ou temporaire"));
     this->_myFile.close();
     temp.close();
     return false;
@@ -276,7 +276,7 @@ bool QameleO_SD::compactBuffer() {
   this->_myFile = SD.open(FILE_NAME_BUFFER, FILE_WRITE);
 
   if(!this->_myFile || !temp) {
-    Serial.println("Erreur : ouverture fichier BUFFER ou temporaire");
+    Serial.println(F("Erreur : ouverture fichier BUFFER ou temporaire"));
     this->_myFile.close();
     temp.close();
     return false;

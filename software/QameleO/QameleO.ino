@@ -79,6 +79,7 @@ void setup() {
 // LOOP
 // ==========================================================================
 void loop() {
+  myGSM.loop();
 
   Serial.println(F("-----------------------------> QameleO - Loop <---------------------------------"));
 
@@ -105,18 +106,23 @@ void loop() {
   //--------------------------------------------------------------------------------------------------------------------
   char * dte = myDataMsg.createMessage(sensorData, reboot);
   Serial.println(F("-------------------------------------------------------------------------------------------------------"));
-  Serial.print(F("Le message : "));
+  Serial.print(F("Message a envoyer : "));
   Serial.println(dte);
 
   Serial.print(F("Le SD : "));
-  mySD.saveToSDBuffer(dte);
+  Serial.println(mySD.saveToSDBuffer(dte) ? F("OK") : F("KO"));
 
-  if(mySD.readNextMessage(message, sizeof(message))) {
-    // Envoie MQTT avec le GSM confirmer
-    if(test <= 5) {
-      mySD.confirmMessageSent();
-      mySD.saveToSDLog(message);
-      mySD.compactBuffer();
+  if(mySD.hasPendingMessages()) {
+    if(mySD.readNextMessage(message, sizeof(message))) {
+      Serial.print(F("Message lu depuis la SD : "));
+      Serial.println(message);
+
+      Serial.println(F("Envoie MQTT : "));
+      if(myGSM.sendData(message)) {
+        mySD.confirmMessageSent();
+        mySD.saveToSDLog(message);
+        mySD.compactBuffer();
+      }
     }
   }
 
