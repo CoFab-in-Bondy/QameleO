@@ -53,6 +53,8 @@ class QameleO_SD {
      */
     bool resetSD();
 
+    bool resetFileDataToSend();
+
     /**
      * @brief Save a message to the SD buffer
      * 

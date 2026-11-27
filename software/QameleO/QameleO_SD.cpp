@@ -43,6 +43,17 @@ bool QameleO_SD::resetSD() {
   return true;
 }
 
+
+bool QameleO_SD::resetFileDataToSend() {
+  if(SD.exists(FILE_NAME_BUFFER)) {
+    Serial.print(F("Suppression du fichier "));
+    Serial.println(FILE_NAME_BUFFER);
+    return SD.remove(FILE_NAME_BUFFER);
+  } else {
+    return false;
+  }
+}
+
 /**
  * @brief Save data in the buffer file
  * 
