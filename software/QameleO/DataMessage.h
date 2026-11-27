@@ -28,7 +28,15 @@ class DataMessage
 
     const char * createMessage(QameleO_measure data, int nbReboot);
 
+    const char * haveNegativeClock(char * msg, int nbRebootMax);
 
+    const char * haveUnixTime(char * msg, size_t capacity);
+
+    static void setUnixTime(unsigned long n);
+
+    bool unixTimeIsSet();
+
+    static unsigned long getUnixTime();
 };
 
 #endif //DATAMESSAGE_H

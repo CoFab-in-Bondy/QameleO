@@ -1,6 +1,10 @@
 #include "DataMessage.h"
 
+#include <limits.h>
+#include <stdint.h>
+
 #include "QameleO_conf.h"
+#include "QameleO_SD.h"
 
 DataMessage::DataMessage() {
   this->_message[0] = '\0';
@@ -163,16 +167,134 @@ const char * DataMessage::createMessage(QameleO_measure data, int nbReboot) {
 }
 
 
+const char* DataMessage::haveNegativeClock(char* msg, int nbRebootMax) {
+    if (msg == nullptr)
+        return nullptr;
+
+    char* first = strchr(msg, ';');
+
+    if (first == nullptr)
+        return nullptr;
+
+    char* second = strchr(first + 1, ';');
+
+    if (second == nullptr)
+        return nullptr;
+
+    char* endNumber = nullptr;
+
+    unsigned long clock = strtoul(msg, &endNumber, 10);
+
+    if (endNumber != first || endNumber == msg)
+        return nullptr;
+
+    long idReboot = strtol(first + 1, &endNumber, 10);
+
+    if (endNumber != second ||
+        endNumber == first + 1 ||
+        idReboot < 0 ||
+        idReboot > INT_MAX)
+        return nullptr;
+
+    QameleO_SD sd;
+
+    int64_t negativeClock =
+        (int64_t)clock -
+        (int64_t)sd.readBackup((int)idReboot, nbRebootMax);
+
+    if (negativeClock < LONG_MIN || negativeClock > LONG_MAX)
+        return nullptr;
+
+    char clockStr[12];
+
+    int len = snprintf(
+        clockStr,
+        sizeof(clockStr),
+        "%ld",
+        (long)negativeClock
+    );
+
+    if (len <= 0 || len >= (int)sizeof(clockStr))
+        return nullptr;
+
+    size_t oldLength = second - msg;
+
+    if ((size_t)len > oldLength)
+        return nullptr;
+
+    memmove(msg + len, second, strlen(second) + 1);
+
+    memcpy(msg, clockStr, len);
+
+    return msg;
+}
 
 
+const char* DataMessage::haveUnixTime(char* msg, size_t capacity)
+{
+  if (msg == nullptr)
+    return nullptr;
+
+  char* first = strchr(msg, ';');
+  if (first == nullptr)
+    return nullptr;
+  char* second = strchr(first + 1, ';');
+  if (second == nullptr)
+    return nullptr;
+
+  char* endNumber = nullptr;
+  unsigned long clockMs = strtoul(msg, &endNumber, 10);
+  if (endNumber != first || endNumber == msg)
+    return nullptr;
+
+  char clockStr[12];
+  int len;
+
+  if (unixTimeIsSet()) {
+    unsigned long unixNow = getUnixTime();
+    Serial.println(F("Unix Time est set"));
+    Serial.println(unixNow);
+
+    unsigned long age = (millis() - clockMs) / 1000;  
+    len = snprintf(clockStr, sizeof(clockStr), "%lu", unixNow - age);
+  } else {
+    Serial.println(F("Unix Time n'est pas set"));
+    len = snprintf(clockStr, sizeof(clockStr), "-1");
+  }
+
+  if (len <= 0 || len >= (int)sizeof(clockStr))
+    return nullptr;
+
+  size_t restLen = strlen(second);
+  if ((size_t)len + restLen + 1 > capacity)
+    return nullptr;
+
+  memmove(msg + len, second, restLen + 1);
+  memcpy(msg, clockStr, len);
+  return msg;
+}
+
+static void DataMessage::setUnixTime(unsigned long n)
+{
+  unixTime = n;
+  lastUpdateTimeClock = millis();
+  Serial.println(unixTime);
+}
 
 
+bool DataMessage::unixTimeIsSet()
+{
+  if(unixTime > 0){
+    return true;
+  }else {
+    return false;
+  }
+}
 
 
-
-
-
-
+static unsigned long DataMessage::getUnixTime(){
+  return unixTime + (millis() - lastUpdateTimeClock)/1000;
+}
 
 
 
