@@ -9,6 +9,13 @@
 #endif
 
 // ============================================================================
+// Periodes de mesure, d'envoi et de synchronisation de l'heure
+// ============================================================================
+#define MEASURE_PERIOD 1             // en minutes
+#define SEND_PERIOD 5                // en minutes
+#define RECEIVE_UNIXTIME_PERIOD 10   // en minutes
+
+// ============================================================================
 // Choix des capteurs
 // Active UN SEUL capteur particules et UN SEUL capteur temperature/humidite.
 // ============================================================================
