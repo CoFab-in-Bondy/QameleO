@@ -1,11 +1,8 @@
 #ifndef QAMELEO_HARD_CONF_H
 #define QAMELEO_HARD_CONF_H
 
-
-
-
 // ============================================================================
-// Capteur humidite / temperature SHT35
+// Capteur humidite / temperature SHT35 et DHT22
 // ============================================================================
 #ifndef ADRESS_I2C_SHT35
   #define ADRESS_I2C_SHT35 0x45
@@ -13,6 +10,14 @@
 
 #ifndef HUMIDITY_TEMP_SWITCH_PIN
   #define HUMIDITY_TEMP_SWITCH_PIN 7
+#endif
+
+#ifndef DHT11_PIN
+  #define DHT11_PIN 4
+#endif
+
+#ifndef DHTTYPE
+  #define DHTTYPE DHT22
 #endif
 
 // ============================================================================

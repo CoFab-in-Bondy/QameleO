@@ -13,7 +13,7 @@
 // ============================================================================
 #define MEASURE_PERIOD 1             // en minutes
 #define SEND_PERIOD 5                // en minutes
-#define RECEIVE_UNIXTIME_PERIOD 10   // en minutes
+#define RECEIVE_UNIXTIME_PERIOD 5    // en minutes
 
 // ============================================================================
 // Choix des capteurs
