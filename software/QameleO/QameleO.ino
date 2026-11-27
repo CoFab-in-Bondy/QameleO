@@ -15,17 +15,31 @@
 #ifdef NextPM_SENSOR
   #include "QameleO_NextPM_Dust.h"
 #endif
+#ifdef PMS7003_SENSOR
+  #include "QameleO_PMS7003_Dust.h"
+#endif
+
 #include "HumidityTempSensor.h"
 #ifdef SHT_SENSOR
   #include "QameleO_SHT35_HumidityTemp.h"
 #endif
+#ifdef DHT_SENSOR
+  #include "QameleO_DHT22_HumidityTemp.h"
+#endif
 
 
 #ifdef NextPM_SENSOR
-  DustSensor *myDustSensor = new QameleO_NextPM_Dust();
+  DustSensor * myDustSensor = new QameleO_NextPM_Dust();
 #endif
+#ifdef PMS7003_SENSOR
+  DustSensor * myDustSensor = new QameleO_PMS7003_Dust();
+#endif
+
 #ifdef SHT_SENSOR
   HumidityTempSensor * myHumidityTempSensor = new QameleO_SHT35_HumidityTemp();
+#endif
+#ifdef DHT_SENSOR
+  HumidityTempSensor * myHumidityTempSensor = new QameleO_DHT22_HumidityTemp();
 #endif
 
 
